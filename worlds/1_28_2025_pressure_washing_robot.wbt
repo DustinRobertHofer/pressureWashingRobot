@@ -1,0 +1,215 @@
+#VRML_SIM R2023b utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/floors/protos/RectangleArena.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/appearances/protos/Copper.proto"
+
+WorldInfo {
+  info [
+    "Description: Examples of four wheels vehicles"
+  ]
+  title "Four Wheels"
+  basicTimeStep 16
+  FPS 32
+  lineScale 0.2
+  contactProperties [
+    ContactProperties {
+      material1 "WheelContact"
+      material2 "FloorContact"
+      coulombFriction [
+        0.8
+      ]
+      bounce 0.2
+      maxContactJoints 20
+    }
+  ]
+}
+Viewpoint {
+  orientation -0.11277279075539867 0.09838197494850899 0.988738228587562 2.1911068847630277
+  position 5.838173150754396 -5.019961782267869 2.5287548794502976
+}
+TexturedBackground {
+}
+TexturedBackgroundLight {
+}
+RectangleArena {
+  contactMaterial "FloorContact"
+  floorSize 9 9
+}
+Solid {
+  translation 0 1.61 0.5
+  children [
+    DEF box Shape {
+      appearance Copper {
+      }
+      geometry Box {
+        size 1 1 1
+      }
+    }
+  ]
+  boundingObject USE box
+  physics Physics {
+    mass 1
+  }
+}
+DEF FOUR_WHEELS Robot {
+  translation 0 0 0.0889888
+  rotation -0.45747601829293477 -0.480478567024122 -0.748235283395062 0.00030179825816413307
+  children [
+    Compass {
+      translation 0 0 0.05
+      children [
+        DEF compass Shape {
+          geometry Cylinder {
+            height 0.02
+            radius 0.05
+          }
+        }
+      ]
+      boundingObject USE compass
+      physics Physics {
+      }
+    }
+    DEF BODY_SHAPE Shape {
+      appearance PBRAppearance {
+        baseColor 0 0.6 1
+        roughness 1
+        metalness 0.5
+      }
+      geometry Box {
+        size 0.3 0.4 0.1
+      }
+    }
+    DEF REAR_RIGHT_WHEEL HingeJoint {
+      jointParameters HingeJointParameters {
+        axis -1 0 0
+        anchor 0.180975 -0.1651 0
+      }
+      device [
+        PositionSensor {
+          name "rear_right_pos"
+        }
+        RotationalMotor {
+          name "rear_right_wheel"
+          maxTorque 100
+        }
+      ]
+      endPoint Solid {
+        translation 0.180975 -0.1651 0
+        rotation -6.447202449618907e-05 0.7364283862505651 -0.6765155044548103 6.719614163086854e-06
+        children [
+          DEF WHEEL_ROT Pose {
+            rotation 0 -1 0 1.5708
+            children [
+              Shape {
+                appearance PBRAppearance {
+                  baseColor 0.8 0 0
+                  roughness 1
+                  metalness 0.8
+                }
+                geometry DEF WHEEL_CYL Cylinder {
+                  height 0.04
+                  radius 0.08
+                }
+              }
+            ]
+          }
+        ]
+        name "rear right wheel"
+        contactMaterial "WheelContact"
+        boundingObject USE WHEEL_ROT
+        physics Physics {
+          mass 5
+        }
+      }
+    }
+    DEF REAR_LEFT_WHEEL HingeJoint {
+      jointParameters HingeJointParameters {
+        axis -1 0 0
+        anchor -0.180975 -0.1651 0
+      }
+      device [
+        PositionSensor {
+          name "rear_left_pos"
+        }
+        RotationalMotor {
+          name "rear_left_wheel"
+        }
+      ]
+      endPoint Solid {
+        translation -0.180975 -0.1651 0
+        rotation -6.528165945729914e-05 -0.8407317912758419 0.5414517992180092 6.283178558417525
+        children [
+          USE WHEEL_ROT
+        ]
+        name "rear left wheel"
+        contactMaterial "WheelContact"
+        boundingObject USE WHEEL_ROT
+        physics Physics {
+          mass 5
+        }
+      }
+    }
+    DEF FRONT_RIGHT_WHEEL HingeJoint {
+      jointParameters HingeJointParameters {
+        axis -1 0 0
+        anchor 0.180975 0.1651 0
+      }
+      device [
+        PositionSensor {
+          name "front_right_pos"
+        }
+        RotationalMotor {
+          name "front_right_wheel"
+        }
+      ]
+      endPoint Solid {
+        translation 0.180975 0.1651 0
+        rotation -3.583514697321654e-05 -0.7791820442916443 0.6267976871123062 6.755076201683962e-06
+        children [
+          USE WHEEL_ROT
+        ]
+        name "front right wheel"
+        contactMaterial "WheelContact"
+        boundingObject USE WHEEL_ROT
+        physics Physics {
+          mass 5
+        }
+      }
+    }
+    DEF FRONT_LEFT_WHEEL HingeJoint {
+      jointParameters HingeJointParameters {
+        axis -1 0 0
+        anchor -0.180975 0.1651 0
+      }
+      device [
+        PositionSensor {
+          name "front_left_pos"
+        }
+        RotationalMotor {
+          name "front_left_wheel"
+        }
+      ]
+      endPoint Solid {
+        translation -0.180975 0.1651 0
+        rotation -6.0548295845204214e-05 0.8751732005682115 -0.48380974084974426 6.283178578055409
+        children [
+          USE WHEEL_ROT
+        ]
+        name "front left wheel"
+        contactMaterial "WheelContact"
+        boundingObject USE WHEEL_ROT
+        physics Physics {
+          mass 5
+        }
+      }
+    }
+  ]
+  name "four_wheels"
+  boundingObject USE BODY_SHAPE
+  physics Physics {
+    mass 1
+  }
+  controller "<extern>"
+}
