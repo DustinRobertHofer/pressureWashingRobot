@@ -3,10 +3,11 @@ import math
 
 
 class DriveSystem:
-    def __init__(self, robot, sensor, timestep):
+    def __init__(self, robot, sensor, timestep, state=None):
         self.robot = robot
         self.sensor = sensor
         self.timestep = timestep
+        self.state = state
         self.MAX_SPEED = 5.0
         
         # Initialize motors
@@ -19,8 +20,8 @@ class DriveSystem:
             motor.setVelocity(0.0)
         
         # Robot physical parameters
-        self.WHEEL_RADIUS = 2.0  # cm
-        self.TURN_RADIUS = 7.125  # cm (distance from center to wheels)
+        self.WHEEL_RADIUS = 8  # cm
+        self.TURN_RADIUS = 18.0975  # cm (distance from center to wheels)
         
         self.sensors = sensor
     
@@ -65,6 +66,8 @@ class DriveSystem:
         if duration:
             start_time = self.robot.getTime()
             while self.robot.step(self.timestep) != -1:
+                if self.state:
+                    self.state.update()
                 if self.robot.getTime() - start_time >= duration:
                     self.stop()
                     break
@@ -77,6 +80,8 @@ class DriveSystem:
         if duration:
             start_time = self.robot.getTime()
             while self.robot.step(self.timestep) != -1:
+                if self.state:
+                    self.state.update()
                 if self.robot.getTime() - start_time >= duration:
                     self.stop()
                     break
@@ -89,6 +94,9 @@ class DriveSystem:
         print(f"Starting turn from {start_bearing:.1f}° to {target_bearing:.1f}°")
         
         while self.robot.step(self.timestep) != -1:
+            if self.state:
+                self.state.update()
+            
             current_bearing = self.sensors.get_bearing()
             error = ((target_bearing - current_bearing + 180) % 360) - 180
             
@@ -108,6 +116,38 @@ class DriveSystem:
             
             # Stop when close enough
             if abs(error) < 0.05:  # 1-degree tolerance
+                break
+        
+        self.stop()
+
+    def is_moving(self):
+        """Check if either motor is moving"""
+        velocities = [abs(motor.getVelocity()) 
+                     for motor in [self.left_front, self.right_front]]
+        return any(v > 0.01 for v in velocities)
+
+    def drive_distance(self, speed, distance):
+        """Move forward a specific distance in meters"""
+        if self.state is None:
+            print("Error: State tracking required for distance-based movement")
+            return
+        
+        speed = min(speed, self.MAX_SPEED)
+        start_x = self.state.x
+        start_y = self.state.y
+        
+        # Start moving
+        self._ramp_speed([speed] * 2)
+        
+        while self.robot.step(self.timestep) != -1:
+            self.state.update()
+            
+            # Calculate distance traveled
+            dx = self.state.x - start_x
+            dy = self.state.y - start_y
+            traveled = math.sqrt(dx*dx + dy*dy)
+            
+            if traveled >= distance:
                 break
         
         self.stop()

@@ -36,8 +36,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation -0.2871314790375227 0.19199543831561133 0.9384525909238681 2.225255604754271
-  position 0.9416838865586679 -1.3491970529312654 1.411338473570288
+  orientation -0.38549623760139806 0.3682620816691315 0.8460352770422072 1.9343530933003834
+  position 2.2982648713098675 -5.873731633475226 8.095849621603088
 }
 TexturedBackground {
 }
@@ -48,7 +48,7 @@ RectangleArena {
   floorSize 9 9
 }
 Solid {
-  translation 0 1.61 0.5
+  translation -2.86 1.61 0.5
   children [
     DEF box Shape {
       appearance Copper {
@@ -115,7 +115,7 @@ DEF TWO_WHEEL_DRIVE Robot {
       }
       device [
         PositionSensor {
-          name "front_right_pos"
+          name "right_pos"
         }
         RotationalMotor {
           name "right_wheel"
@@ -157,7 +157,7 @@ DEF TWO_WHEEL_DRIVE Robot {
       }
       device [
         PositionSensor {
-          name "front_left_pos"
+          name "left_pos"
         }
         RotationalMotor {
           name "left_wheel"
