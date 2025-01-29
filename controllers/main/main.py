@@ -1,6 +1,6 @@
 from controller import Robot
 from driveSystem import DriveSystem
-from digitalCompass import DigitalCompass
+from sensors.digitalCompass import DigitalCompass
 
 # Initialize the robot
 robot = Robot()
