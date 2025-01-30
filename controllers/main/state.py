@@ -40,7 +40,7 @@ class State:
         delta_right = right_ticks - self.prev_right_ticks
         
         # Apply scaling factor to compensate for systematic errors
-        TICK_SCALE = 0.98  # Adjust this value based on testing
+        TICK_SCALE = 1 # Adjust this value based on testing
         delta_left *= TICK_SCALE
         delta_right *= TICK_SCALE
         
