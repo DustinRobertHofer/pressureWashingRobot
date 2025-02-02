@@ -25,24 +25,37 @@ state = State(robot, timestep)
 
 # Then create drive system with state
 drive = DriveSystem(robot, sensor, timestep, state)
-
+speed = 3.0
 # Main control loop
 while robot.step(timestep) != -1:
   
     print_position(state)
     delay(1)
-    # Example movement sequence - one step at a time
-    drive.drive_distance(8.0, 0.5)  # Drive 0.5 meters
-    drive.stop()
+    drive.drive_distance(speed, 1.0)
     print_position(state)
     delay(1)
-
-    drive.turn(8.0, 90)
-    drive.stop()
+    drive.turn(speed, 90)
     print_position(state)
     delay(1)
+    drive.drive_distance(speed, 1.0)
+    print_position(state)
+    delay(1)
+    drive.turn(speed, 90)
+    print_position(state)
+    delay(1)
+    drive.drive_distance(speed, 1.0)
+    print_position(state)   
+    delay(1)
+    drive.drive_distance(speed, 1.0)
+    print_position(state)
+    delay(1)
+    drive.turn(speed, 90)
+    print_position(state)
+    delay(10)
 
     
+
+
 
     
     

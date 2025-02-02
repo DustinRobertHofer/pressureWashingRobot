@@ -18,11 +18,7 @@ class DriveSystem:
         for motor in [self.left_front, self.right_front]:
             motor.setPosition(float('inf'))
             motor.setVelocity(0.0)
-        
-        # Robot physical parameters
-        self.WHEEL_RADIUS = 8  # cm
-        self.TURN_RADIUS = 18.0975  # cm (distance from center to wheels)
-        
+    
         self.sensors = sensor
     
     def set_left_speed(self, speed):
@@ -87,35 +83,50 @@ class DriveSystem:
                     break
     
     def turn(self, speed, degrees):
-        """Turn in place by specified degrees using compass feedback"""
-        start_bearing = self.sensors.get_bearing()
-        target_bearing = (start_bearing + degrees) % 360
-        
-        print(f"Starting turn from {start_bearing:.1f}° to {target_bearing:.1f}°")
+        """Turn in place by specified degrees using state tracking"""
+        if self.state is None:
+            print("Error: State tracking required for turning")
+            return
+            
+        # Convert current heading to degrees for easier math
+        start_heading = self.state.theta * 180 / math.pi
+        target_heading = (start_heading + degrees) % 360
+        rampupTicks = 10
+        print(f"Starting turn from {start_heading:.1f}° to {target_heading:.1f}°")
         
         while self.robot.step(self.timestep) != -1:
-            if self.state:
-                self.state.update()
+            self.state.update()
             
-            current_bearing = self.sensors.get_bearing()
-            error = ((target_bearing - current_bearing + 180) % 360) - 180
+            # Get current heading in degrees
+            current_heading = (self.state.theta * 180 / math.pi) % 360
+            
+            # Calculate shortest angle to target
+            error = target_heading - current_heading
+
+            #error = ((target_heading - current_heading + 180) % 360) - 180
             
             # Calculate proportional speed based on error
-            speed_factor = min(abs(error) / 45.0, 1.0)  # Gradually reduce speed as error decreases
+            if rampupTicks > 0:
+                speed_factor = rampupTicks / 10
+                rampupTicks -= 1
+            else:
+                speed_factor = min(abs(error) / 45.0, 1)  # Gradually reduce speed as error decreases
+
             turn_speed = speed * speed_factor
             
+
             # Set motor speeds based on turn direction
-            if degrees < 0:  # Turn left
-                self.set_right_speed(turn_speed)
-                self.set_left_speed(-turn_speed)
-            else:  # Turn right
+            if degrees > 0:  # Turn right
                 self.set_right_speed(-turn_speed)
                 self.set_left_speed(turn_speed)
+            else:  # Turn left
+                self.set_right_speed(turn_speed)
+                self.set_left_speed(-turn_speed)
             
-            print(f"Current: {current_bearing:.1f}°, Target: {target_bearing:.1f}°, Error: {error:.1f}°")
+            print(f"Current: {current_heading:.1f}°, Target: {target_heading:.1f}°, Error: {error:.1f}°, Speed Factor: {speed_factor:.1f}")
             
             # Stop when close enough
-            if abs(error) < 0.05:  # 1-degree tolerance
+            if abs(error) < 0.1:  # 0.5-degree tolerance
                 break
         
         self.stop()
