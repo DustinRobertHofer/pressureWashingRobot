@@ -16,14 +16,9 @@ class Navigator:
         """Load and process path points from PathGenerator"""
         # PathCoordinates comes as a flat array, reshape into pairs
         points = np.array(PathCoordinates).reshape(-1, 2)
-        
-        # Convert from inches to meters and add return point
+      
+        # Convert from inches to meters
         self.path_points = (points - 8) * 0.0254  # 1 inch = 0.0254 meters
-        
-        # Add return to origin point [0,0]
-        return_point = np.array([[0.0, 0.0]])
-        self.path_points = np.vstack([self.path_points, return_point])
-        
         print(self.path_points)
         self.current_point_index = 0
         return self.path_points

@@ -4,9 +4,8 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/project
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/appearances/protos/Copper.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/appearances/protos/GalvanizedMetal.proto"
-EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/road/protos/AddLanesRoadSegment.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/road/protos/StraightRoadSegment.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/road/protos/RoadLine.proto"
-EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/appearances/protos/Asphalt.proto"
 
 WorldInfo {
   info [
@@ -38,27 +37,25 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation 0.22865509538800846 -0.17679711886655142 -0.9573189782478917 4.165147786997487
-  position 6.553449400057932 -6.422122023363612 5.417237049968592
+  orientation 0.25735186561336654 -0.33514986698660254 -0.9063358008620107 4.661928750835658
+  position 1.3034472479612664 -8.632545633441833 5.799217226447372
 }
 TexturedBackground {
 }
 TexturedBackgroundLight {
 }
-AddLanesRoadSegment {
-  translation -9.05 0 0
-  width 10
-  numberOfNewLanes 0
+StraightRoadSegment {
+  translation -0.39 2.5 0
+  name "road(1)"
+  width 6
+  numberOfLanes 1
   lines [
     RoadLine {
       type "continuous"
     }
   ]
-  rightBorder FALSE
-  leftBorder FALSE
-  appearance Asphalt {
-    IBLStrength 0.5
-  }
+  bottom TRUE
+  length 7
   roadBoundingObject TRUE
   contactMaterial "FloorContact"
 }
@@ -86,6 +83,7 @@ DEF TWO_WHEEL_DRIVE Robot {
       inkColor 1 0 0
       inkDensity 1
       leadSize 0.02
+      write FALSE
     }
     Solid {
       translation 0 -0.2 -0.03

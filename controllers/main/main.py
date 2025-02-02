@@ -40,6 +40,7 @@ pen.write(False)  # Activate the pen
 while robot.step(timestep) != -1:
     # Load and follow the generated path
     navigator.navigate_path(5)
+    #drive.drive_distance(6, 5)
     print_position(state)
 
     break

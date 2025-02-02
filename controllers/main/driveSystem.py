@@ -126,7 +126,7 @@ class DriveSystem:
             #print(f"Current: {current_heading:.1f}°, Target: {target_heading:.1f}°, Error: {error:.1f}°, Speed Factor: {speed_factor:.1f}")
             
             # Stop when close enough
-            if abs(error) < 0.1:  # 0.5-degree tolerance
+            if abs(error) < 0.5:  # 0.5-degree tolerance
                 break
         
         self.stop()
