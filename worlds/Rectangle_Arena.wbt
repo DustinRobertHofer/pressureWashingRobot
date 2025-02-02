@@ -2,9 +2,11 @@
 
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackground.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
-EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/floors/protos/RectangleArena.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/appearances/protos/Copper.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/appearances/protos/GalvanizedMetal.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/road/protos/AddLanesRoadSegment.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/road/protos/RoadLine.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/appearances/protos/Asphalt.proto"
 
 WorldInfo {
   info [
@@ -36,19 +38,32 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation -0.2871314790375227 0.19199543831561133 0.9384525909238681 2.225255604754271
-  position 0.9416838865586679 -1.3491970529312654 1.411338473570288
+  orientation 0.22865509538800846 -0.17679711886655142 -0.9573189782478917 4.165147786997487
+  position 6.553449400057932 -6.422122023363612 5.417237049968592
 }
 TexturedBackground {
 }
 TexturedBackgroundLight {
 }
-RectangleArena {
+AddLanesRoadSegment {
+  translation -9.05 0 0
+  width 10
+  numberOfNewLanes 0
+  lines [
+    RoadLine {
+      type "continuous"
+    }
+  ]
+  rightBorder FALSE
+  leftBorder FALSE
+  appearance Asphalt {
+    IBLStrength 0.5
+  }
+  roadBoundingObject TRUE
   contactMaterial "FloorContact"
-  floorSize 9 9
 }
 Solid {
-  translation 0 1.61 0.5
+  translation -2.86 1.61 0.5
   children [
     DEF box Shape {
       appearance Copper {
@@ -64,9 +79,14 @@ Solid {
   }
 }
 DEF TWO_WHEEL_DRIVE Robot {
-  translation 0 0 0.0889888
-  rotation -0.45747601829293477 -0.480478567024122 -0.748235283395062 0.00030179825816413307
+  translation 0 0 0.082
   children [
+    Pen {
+      name "TRACK_PEN"
+      inkColor 1 0 0
+      inkDensity 1
+      leadSize 0.02
+    }
     Solid {
       translation 0 -0.2 -0.03
       children [
@@ -115,15 +135,15 @@ DEF TWO_WHEEL_DRIVE Robot {
       }
       device [
         PositionSensor {
-          name "front_right_pos"
+          name "right_pos"
         }
         RotationalMotor {
           name "right_wheel"
         }
       ]
       endPoint Solid {
-        translation 0.180975 0.1651 0
-        rotation -3.583514697321654e-05 -0.7791820442916443 0.6267976871123062 6.755076201683962e-06
+        translation 0.18121970955473965 0.16547422494720598 -0.00011918096786542414
+        rotation 0.006079601616780442 -0.9999663235963087 0.0055127232348293085 6.279297135597885
         children [
           DEF WHEEL_ROT Pose {
             rotation 0 -1 0 1.5708
@@ -157,14 +177,14 @@ DEF TWO_WHEEL_DRIVE Robot {
       }
       device [
         PositionSensor {
-          name "front_left_pos"
+          name "left_pos"
         }
         RotationalMotor {
           name "left_wheel"
         }
       ]
       endPoint Solid {
-        translation -0.180975 0.1651 0
+        translation -0.18122 0.1651 0
         rotation -6.0548295845204214e-05 0.8751732005682115 -0.48380974084974426 6.283178578055409
         children [
           USE WHEEL_ROT
