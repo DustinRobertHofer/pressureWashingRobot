@@ -2,10 +2,11 @@
 
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackground.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
-EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/appearances/protos/Copper.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/appearances/protos/GalvanizedMetal.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/road/protos/StraightRoadSegment.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/road/protos/RoadLine.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/obstacles/protos/OilBarrel.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/appearances/protos/Plastic.proto"
 
 WorldInfo {
   info [
@@ -37,8 +38,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation 0.25735186561336654 -0.33514986698660254 -0.9063358008620107 4.661928750835658
-  position 1.3034472479612664 -8.632545633441833 5.799217226447372
+  orientation 0.3471318718534879 -0.0922331031921196 -0.9332697992644172 3.847032922998091
+  position 7.844422358083567 -3.4604357077664427 5.926865040115767
 }
 TexturedBackground {
 }
@@ -59,31 +60,34 @@ StraightRoadSegment {
   roadBoundingObject TRUE
   contactMaterial "FloorContact"
 }
-Solid {
-  translation -2.86 1.61 0.5
-  children [
-    DEF box Shape {
-      appearance Copper {
-      }
-      geometry Box {
-        size 1 1 1
-      }
-    }
-  ]
-  boundingObject USE box
+OilBarrel {
+  translation 3.14 4.52 0.44
   physics Physics {
-    mass 1
   }
 }
 DEF TWO_WHEEL_DRIVE Robot {
   translation 0 0 0.082
   children [
-    Pen {
-      name "TRACK_PEN"
-      inkColor 1 0 0
-      inkDensity 1
-      leadSize 0.02
-      write FALSE
+    DistanceSensor {
+      translation 0 0.2 0
+      rotation 0 0 1 1.570796327
+      children [
+        DEF SENSOR Shape {
+          appearance Plastic {
+          }
+          geometry Box {
+            size 0.01 0.01 0.01
+          }
+        }
+      ]
+      boundingObject USE SENSOR
+      physics Physics {
+      }
+      lookupTable [
+        0 0 0
+        2 1000 0
+      ]
+      type "sonar"
     }
     Solid {
       translation 0 -0.2 -0.03
@@ -140,8 +144,8 @@ DEF TWO_WHEEL_DRIVE Robot {
         }
       ]
       endPoint Solid {
-        translation 0.18121970955473965 0.16547422494720598 -0.00011918096786542414
-        rotation 0.006079601616780442 -0.9999663235963087 0.0055127232348293085 6.279297135597885
+        translation 0.18122 0.16513648034152356 0.00037221658302973894
+        rotation -1 0 0 0
         children [
           DEF WHEEL_ROT Pose {
             rotation 0 -1 0 1.5708
@@ -182,8 +186,8 @@ DEF TWO_WHEEL_DRIVE Robot {
         }
       ]
       endPoint Solid {
-        translation -0.18122 0.1651 0
-        rotation -6.0548295845204214e-05 0.8751732005682115 -0.48380974084974426 6.283178578055409
+        translation -0.18122 0.165474 0
+        rotation -1 0 0 0
         children [
           USE WHEEL_ROT
         ]

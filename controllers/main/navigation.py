@@ -3,14 +3,15 @@ import math
 from pathGeneration.PathGenerator import PathCoordinates
 
 class Navigator:
-    def __init__(self, state, drive_system):
+    def __init__(self, state, drive_system, obstacle_avoider=None):
         self.state = state
         self.drive = drive_system
         self.path_points = None
         self.current_point_index = 0
-        self.position_tolerance = 0.1  # meters
-        self.angle_tolerance = 2.0  # degrees
+        self.position_tolerance = 0.05  # meters
+        self.angle_tolerance = 1.0  # degrees
         self.default_speed = 3.0
+
 
     def load_path(self):
         """Load and process path points from PathGenerator"""
@@ -19,9 +20,14 @@ class Navigator:
       
         # Convert from inches to meters
         self.path_points = (points - 8) * 0.0254  # 1 inch = 0.0254 meters
+        # add a 0,0 point to the end of the path
+        self.path_points = np.vstack([self.path_points, [0,0]])
+       
+
         print(self.path_points)
         self.current_point_index = 0
         return self.path_points
+
 
 
     def get_angle_to_target(self, target_x, target_y):

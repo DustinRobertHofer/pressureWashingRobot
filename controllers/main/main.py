@@ -1,8 +1,10 @@
 from controller import Robot
 from driveSystem import DriveSystem
 from sensors.digitalCompass import DigitalCompass
+from sensors.laserRange import LaserRange
 from state import State
 from navigation import Navigator
+from obstacleAvoidance import ObstacleAvoider
 
 # Initialize the robot
 robot = Robot()
@@ -22,17 +24,24 @@ def print_position(state):
 
 # Create sensor systems
 sensor = DigitalCompass(robot, timestep)
+laser_range = LaserRange(robot, timestep)
 state = State(robot, timestep)
 
 # Create drive system with state
 drive = DriveSystem(robot, sensor, timestep, state)
 
+# Create obstacle avoider
+obstacle_avoider = ObstacleAvoider(state, drive, laser_range)
+
+# Update drive system with obstacle avoider
+drive.obstacle_avoider = obstacle_avoider
+
 # Create navigation system
 navigator = Navigator(state, drive)
 
-# pen tracking
-pen = robot.getDevice("TRACK_PEN")
-pen.write(False)  # Activate the pen
+# # pen tracking
+# pen = robot.getDevice("TRACK_PEN")
+# pen.write(False)  # Activate the pen
 
 
 

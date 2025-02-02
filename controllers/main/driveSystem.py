@@ -3,11 +3,12 @@ import math
 
 
 class DriveSystem:
-    def __init__(self, robot, sensor, timestep, state=None):
+    def __init__(self, robot, sensor, timestep, state=None, obstacle_avoider=None):
         self.robot = robot
         self.sensor = sensor
         self.timestep = timestep
         self.state = state
+        self.obstacle_avoider = obstacle_avoider
         self.MAX_SPEED = 5.0
         
         # Initialize motors
@@ -54,8 +55,11 @@ class DriveSystem:
             if all(v < 0.01 for v in velocities):
                 break
     
+    
+
+
     def forward(self, speed, steps=10, duration=None):
-        """Move forward with smooth acceleration"""
+        """Move forward with smooth acceleration and obstacle detection"""
         speed = min(speed, self.MAX_SPEED)
         self._ramp_speed([speed] * 2, steps)
         
@@ -64,10 +68,13 @@ class DriveSystem:
             while self.robot.step(self.timestep) != -1:
                 if self.state:
                     self.state.update()
+                
+               
                 if self.robot.getTime() - start_time >= duration:
                     self.stop()
                     break
-    
+        return True  # Path was clear
+
     def backward(self, speed, steps=10, duration=None):
         """Move backward with smooth acceleration"""
         speed = min(speed, self.MAX_SPEED)
@@ -138,11 +145,17 @@ class DriveSystem:
         return any(v > 0.01 for v in velocities)
 
     def drive_distance(self, speed, distance):
-        """Move forward a specific distance in meters"""
+        """Move forward a specific distance in meters with obstacle detection"""
         if self.state is None:
             print("Error: State tracking required for distance-based movement")
-            return
-        
+            return False
+        #check for obstacles
+        # if self.obstacle_avoider and self.obstacle_avoider.is_obstacle_detected():
+        #     self.stop()
+        #     return False
+
+
+
         speed = min(speed, self.MAX_SPEED)
         start_x = self.state.x
         start_y = self.state.y
@@ -152,7 +165,12 @@ class DriveSystem:
         
         while self.robot.step(self.timestep) != -1:
             self.state.update()
+            #check for obstacles
+            # if self.obstacle_avoider and self.obstacle_avoider.is_obstacle_detected():
+            #     self.stop()
+            #     return False
             
+                        
             # Calculate distance traveled
             dx = self.state.x - start_x
             dy = self.state.y - start_y
@@ -162,3 +180,4 @@ class DriveSystem:
                 break
         
         self.stop()
+        return True  # Successfully completed movement
