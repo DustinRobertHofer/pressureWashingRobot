@@ -27,14 +27,13 @@ sensor = DigitalCompass(robot, timestep)
 laser_range = LaserRange(robot, timestep)
 state = State(robot, timestep)
 
-# Create drive system with state
-drive = DriveSystem(robot, sensor, timestep, state)
+
 
 # Create obstacle avoider
-obstacle_avoider = ObstacleAvoider(state, drive, laser_range)
+obstacle_avoider = ObstacleAvoider(state, laser_range)
 
-# Update drive system with obstacle avoider
-drive.obstacle_avoider = obstacle_avoider
+# Create drive system with state
+drive = DriveSystem(robot, obstacle_avoider, sensor, timestep, state)
 
 # Create navigation system
 navigator = Navigator(state, drive)

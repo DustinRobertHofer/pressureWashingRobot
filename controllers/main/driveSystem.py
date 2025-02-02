@@ -3,7 +3,7 @@ import math
 
 
 class DriveSystem:
-    def __init__(self, robot, sensor, timestep, state=None, obstacle_avoider=None):
+    def __init__(self, robot, obstacle_avoider, sensor, timestep, state=None):
         self.robot = robot
         self.sensor = sensor
         self.timestep = timestep
@@ -137,9 +137,12 @@ class DriveSystem:
                 break
         
         self.stop()
+    def is_obstacle_detected(self):
+        return self.obstacle_avoider.is_obstacle_detected()
 
     def is_moving(self):
         """Check if either motor is moving"""
+
         velocities = [abs(motor.getVelocity()) 
                      for motor in [self.left_front, self.right_front]]
         return any(v > 0.01 for v in velocities)
@@ -149,10 +152,11 @@ class DriveSystem:
         if self.state is None:
             print("Error: State tracking required for distance-based movement")
             return False
-        #check for obstacles
-        # if self.obstacle_avoider and self.obstacle_avoider.is_obstacle_detected():
+        
+         #check for obstacles
+        # if self.is_obstacle_detected():
         #     self.stop()
-        #     return False
+        #     # return False
 
 
 
@@ -160,13 +164,14 @@ class DriveSystem:
         start_x = self.state.x
         start_y = self.state.y
         
+
         # Start moving
         self._ramp_speed([speed] * 2)
         
         while self.robot.step(self.timestep) != -1:
             self.state.update()
             #check for obstacles
-            # if self.obstacle_avoider and self.obstacle_avoider.is_obstacle_detected():
+            # if self.is_obstacle_detected():
             #     self.stop()
             #     return False
             

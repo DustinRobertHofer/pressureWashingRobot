@@ -1,9 +1,8 @@
 import math
 
 class ObstacleAvoider:
-    def __init__(self, state, drive_system, laser_range):
+    def __init__(self, state,  laser_range):
         self.state = state
-        self.drive = drive_system
         self.laser_range = laser_range
         self.avoidance_speed = 2.0
         self.turn_speed = 2.0
