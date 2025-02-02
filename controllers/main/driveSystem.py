@@ -92,7 +92,7 @@ class DriveSystem:
         start_heading = self.state.theta * 180 / math.pi
         target_heading = (start_heading + degrees) % 360
         rampupTicks = 10
-        print(f"Starting turn from {start_heading:.1f}° to {target_heading:.1f}°")
+        #print(f"Starting turn from {start_heading:.1f}° to {target_heading:.1f}°")
         
         while self.robot.step(self.timestep) != -1:
             self.state.update()
@@ -123,7 +123,7 @@ class DriveSystem:
                 self.set_right_speed(turn_speed)
                 self.set_left_speed(-turn_speed)
             
-            print(f"Current: {current_heading:.1f}°, Target: {target_heading:.1f}°, Error: {error:.1f}°, Speed Factor: {speed_factor:.1f}")
+            #print(f"Current: {current_heading:.1f}°, Target: {target_heading:.1f}°, Error: {error:.1f}°, Speed Factor: {speed_factor:.1f}")
             
             # Stop when close enough
             if abs(error) < 0.1:  # 0.5-degree tolerance

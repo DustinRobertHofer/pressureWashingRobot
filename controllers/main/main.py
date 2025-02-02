@@ -2,6 +2,7 @@ from controller import Robot
 from driveSystem import DriveSystem
 from sensors.digitalCompass import DigitalCompass
 from state import State
+from navigation import Navigator
 
 # Initialize the robot
 robot = Robot()
@@ -23,35 +24,25 @@ def print_position(state):
 sensor = DigitalCompass(robot, timestep)
 state = State(robot, timestep)
 
-# Then create drive system with state
+# Create drive system with state
 drive = DriveSystem(robot, sensor, timestep, state)
-speed = 3.0
+
+# Create navigation system
+navigator = Navigator(state, drive)
+
+# pen tracking
+pen = robot.getDevice("TRACK_PEN")
+pen.write(False)  # Activate the pen
+
+
+
 # Main control loop
 while robot.step(timestep) != -1:
-  
+    # Load and follow the generated path
+    navigator.navigate_path(5)
     print_position(state)
-    delay(1)
-    drive.drive_distance(speed, 1.0)
-    print_position(state)
-    delay(1)
-    drive.turn(speed, 90)
-    print_position(state)
-    delay(1)
-    drive.drive_distance(speed, 1.0)
-    print_position(state)
-    delay(1)
-    drive.turn(speed, 90)
-    print_position(state)
-    delay(1)
-    drive.drive_distance(speed, 1.0)
-    print_position(state)   
-    delay(1)
-    drive.drive_distance(speed, 1.0)
-    print_position(state)
-    delay(1)
-    drive.turn(speed, 90)
-    print_position(state)
-    delay(10)
+
+    break
 
     
 

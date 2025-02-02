@@ -2,9 +2,11 @@
 
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackground.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
-EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/floors/protos/RectangleArena.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/appearances/protos/Copper.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/appearances/protos/GalvanizedMetal.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/road/protos/AddLanesRoadSegment.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/road/protos/RoadLine.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/appearances/protos/Asphalt.proto"
 
 WorldInfo {
   info [
@@ -36,16 +38,29 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation -0.1875572899764913 0.23068301379909692 0.9547814462594254 1.6976034798789021
-  position 0.2886249507580785 -2.0429535661532037 1.1063851988475244
+  orientation 0.22865509538800846 -0.17679711886655142 -0.9573189782478917 4.165147786997487
+  position 6.553449400057932 -6.422122023363612 5.417237049968592
 }
 TexturedBackground {
 }
 TexturedBackgroundLight {
 }
-RectangleArena {
+AddLanesRoadSegment {
+  translation -9.05 0 0
+  width 10
+  numberOfNewLanes 0
+  lines [
+    RoadLine {
+      type "continuous"
+    }
+  ]
+  rightBorder FALSE
+  leftBorder FALSE
+  appearance Asphalt {
+    IBLStrength 0.5
+  }
+  roadBoundingObject TRUE
   contactMaterial "FloorContact"
-  floorSize 9 9
 }
 Solid {
   translation -2.86 1.61 0.5
@@ -66,6 +81,12 @@ Solid {
 DEF TWO_WHEEL_DRIVE Robot {
   translation 0 0 0.082
   children [
+    Pen {
+      name "TRACK_PEN"
+      inkColor 1 0 0
+      inkDensity 1
+      leadSize 0.02
+    }
     Solid {
       translation 0 -0.2 -0.03
       children [
