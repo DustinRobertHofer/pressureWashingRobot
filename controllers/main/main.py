@@ -36,22 +36,25 @@ obstacle_avoider = ObstacleAvoider(state, laser_range)
 drive = DriveSystem(robot, obstacle_avoider, sensor, timestep, state)
 
 # Create navigation system
-navigator = Navigator(state, drive)
-
-# # pen tracking
-# pen = robot.getDevice("TRACK_PEN")
-# pen.write(False)  # Activate the pen
-
-
+navigator = Navigator(drive, timestep)
 
 # Main control loop
 while robot.step(timestep) != -1:
-    # Load and follow the generated path
-    navigator.navigate_path(5)
-    #drive.drive_distance(6, 5)
+    # Update the state
+    state.update()
+    current_position = state.get_position()
+    
+    # Set up the path if not already set
+    if not navigator.current_goal:
+        navigator.set_big_square_test()  # Use the 5m x 5m square test
+    
+    # Follow the path
+    if not navigator.follow_path(current_position):
+        print("Path following completed")
+        break
+    
+    # Print current position for debugging
     print_position(state)
-
-    break
 
     
 

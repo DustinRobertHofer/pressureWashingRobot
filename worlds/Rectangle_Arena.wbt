@@ -38,8 +38,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation 0.3471318718534879 -0.0922331031921196 -0.9332697992644172 3.847032922998091
-  position 7.844422358083567 -3.4604357077664427 5.926865040115767
+  orientation 0.6019093526127498 -0.5670657997614547 -0.5622646262910392 4.2424859024909605
+  position 2.9727800722563407 2.3354463343895233 20.97705442671241
 }
 TexturedBackground {
 }
@@ -61,7 +61,7 @@ StraightRoadSegment {
   contactMaterial "FloorContact"
 }
 OilBarrel {
-  translation 3.14 4.52 0.44
+  translation 3.14 5.42 0.44
   physics Physics {
   }
 }
@@ -205,5 +205,5 @@ DEF TWO_WHEEL_DRIVE Robot {
   physics Physics {
     mass 1
   }
-  controller "main"
+  controller "robotControl"
 }
