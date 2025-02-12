@@ -27,6 +27,8 @@ class RobotController:
         """Perform any necessary setup operations"""
         # Start the square test
         self.navigator.set_big_square_test()
+        # test
+        
         
     def step(self):
         """Main control loop - called every timestep"""
