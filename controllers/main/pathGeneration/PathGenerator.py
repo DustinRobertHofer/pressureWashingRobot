@@ -563,4 +563,39 @@ print(PathCoordinates)
 # Wait for a key press to close the image window
 cv2.waitKey(0)
 cv2.destroyAllWindows()
+
+def generate_path(points, surface_cleaner_diameter, path_overlap, edge_buffer, show_visualization=False):
+    """Generate a cleaning path from boundary points
+    Args:
+        points: List of numpy arrays containing [x,y] coordinates in feet
+        surface_cleaner_diameter: Diameter of cleaning head in inches
+        path_overlap: Overlap between passes in inches
+        edge_buffer: Buffer from edges in inches
+        show_visualization: Whether to show the visualization window
+    Returns:
+        Array of coordinates representing the path
+    """
+    # Extract the water supply coordinates (assuming last point is water supply)
+    WaterSupplyCoord = points[-1]
+    Points = np.array(points[:-1])  # Boundary points only
+    
+    # Convert from ft to inches
+    PointsInches = Points * 12
+    
+    # ... rest of the existing path generation code, but remove the visualization unless show_visualization=True ...
+    
+    # Return the path coordinates
+    return PathCoordinates
+
+# Only run visualization if script is run directly
+if __name__ == "__main__":
+    # Original test code here
+    P1 = np.array([0,0])
+    P2 = np.array([9,0])
+    P3 = np.array([0,9])
+    P4 = np.array([9,9])
+    WaterSupplyCoord = np.array([2,-2])
+    
+    points = [P1, P2, P3, P4, WaterSupplyCoord]
+    path = generate_path(points, 12, 3, 8, show_visualization=True)
  
