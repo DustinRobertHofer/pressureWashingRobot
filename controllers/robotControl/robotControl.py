@@ -54,8 +54,17 @@ class RobotController:
         self.sensor_manager.update()
         self.state.update(self.sensor_manager.get_sensor_data())
         
+        # Get current state including obstacle information
+        current_state = self.state.get_position()
+        
         # Get and execute navigation commands
-        nav_command = self.navigator.get_next_command(self.state.get_position())
+        nav_command = self.navigator.get_next_command(current_state)
+        
+        # Execute the command with obstacle awareness
+        if current_state.get('obstacle_detected', False):
+            # Log obstacle detection
+            print(f"Obstacle detected at distance: {current_state['obstacle_distance']:.2f}m")
+            
         self.motion_controller.execute_command(nav_command)
         
         # If we've stopped, exit the simulation

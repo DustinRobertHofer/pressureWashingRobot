@@ -36,8 +36,8 @@ def generate_cleaning_path(boundary_points, surface_cleaner_diameter=12, path_ov
     waypoints = []
     for i in range(0, len(path_coordinates), 2):
         # Convert from inches to meters (1 inch = 0.0254 meters)
-        x_meters = path_coordinates[i] * 0.0254 + origin_x
-        y_meters = path_coordinates[i+1] * 0.0254 + origin_y
+        x_meters = path_coordinates[i]['x'] * 0.0254 + origin_x
+        y_meters = path_coordinates[i]['y'] * 0.0254 + origin_y
         waypoints.append({'x': x_meters, 'y': y_meters})
     
     return waypoints
@@ -85,7 +85,7 @@ def _calculate_path(points_inches, surface_cleaner_diameter, path_overlap, edge_
     spacing_pixels = int((surface_cleaner_diameter - path_overlap) * scale)
     
     # Generate path coordinates
-    path = []
+    path_coords = []
     y = padding
     going_right = True
     
@@ -99,21 +99,17 @@ def _calculate_path(points_inches, surface_cleaner_diameter, path_overlap, edge_
             
             # Convert back to inches and add to path
             if going_right:
-                path.extend([
-                    (start_x - padding) / scale + min_x,
-                    (y - padding) / scale + min_y,
-                    (end_x - padding) / scale + min_x,
-                    (y - padding) / scale + min_y
+                path_coords.extend([
+                    {'x': (start_x - padding) / scale + min_x, 'y': (y - padding) / scale + min_y},
+                    {'x': (end_x - padding) / scale + min_x, 'y': (y - padding) / scale + min_y}
                 ])
             else:
-                path.extend([
-                    (end_x - padding) / scale + min_x,
-                    (y - padding) / scale + min_y,
-                    (start_x - padding) / scale + min_x,
-                    (y - padding) / scale + min_y
+                path_coords.extend([
+                    {'x': (end_x - padding) / scale + min_x, 'y': (y - padding) / scale + min_y},
+                    {'x': (start_x - padding) / scale + min_x, 'y': (y - padding) / scale + min_y}
                 ])
         
         y += spacing_pixels
         going_right = not going_right
     
-    return path 
+    return path_coords 
