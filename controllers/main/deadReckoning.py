@@ -1,7 +1,5 @@
 from math import sin, cos, pi
 
-# comment
-
 class DeadReckoning:
     def __init__(self, robot, timestep):
         """Initialize dead reckoning system using wheel encoders"""
