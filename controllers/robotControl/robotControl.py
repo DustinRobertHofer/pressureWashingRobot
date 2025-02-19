@@ -11,6 +11,7 @@ from config.robot_config import (
     CLEANING_AREAS,
     SIMULATION_PARAMS
 )
+# Test comment
 
 class RobotController:
     def __init__(self, robot, timestep):
