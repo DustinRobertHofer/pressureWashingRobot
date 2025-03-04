@@ -113,3 +113,15 @@ def _calculate_path(points_inches, surface_cleaner_diameter, path_overlap, edge_
         going_right = not going_right
     
     return path_coords 
+
+class CleaningPathGenerator:
+    """Generates cleaning paths for the robot"""
+    
+    def __init__(self):
+        """Initialize the cleaning path generator"""
+        self.path_overlap_ratio = 0.25  # 25% overlap between cleaning passes
+        
+    def generate_path(self, boundary_points, cleaning_width=0.3):
+        """Generate a cleaning path given boundary points"""
+        # This is a wrapper around the generate_cleaning_path function
+        return generate_cleaning_path(boundary_points, cleaning_width, self.path_overlap_ratio) 

@@ -7,6 +7,7 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/project
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/road/protos/RoadLine.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/obstacles/protos/OilBarrel.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/appearances/protos/Plastic.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/devices/robotis/protos/RobotisLds01.proto"
 
 WorldInfo {
   info [
@@ -39,8 +40,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation 0.5192329422489791 -0.5082484406134689 -0.687081271974026 4.475251319646919
-  position 1.0066878007632116 -7.932631672698643 24.08289193495743
+  orientation -0.19817575948630212 0.8721319130219557 0.4473391271068192 1.7678318732164682
+  position 1.2046446826120651 -3.2752487437531186 12.34343859273745
 }
 TexturedBackground {
 }
@@ -71,6 +72,11 @@ OilBarrel {
 DEF TWO_WHEEL_DRIVE Robot {
   translation 0 0 0.082
   children [
+    RobotisLds01 {
+      translation 0 0.16 0.11
+      rotation 0 0 1 1.5708
+      name "laser"
+    }
     DistanceSensor {
       translation 0 0.2 0
       rotation 0 0 1 1.570796327
@@ -150,8 +156,8 @@ DEF TWO_WHEEL_DRIVE Robot {
         }
       ]
       endPoint Solid {
-        translation 0.18122 0.16513648034152356 0.00037221658302973894
-        rotation -1 0 0 0
+        translation 0.18122005685447054 0.16513777871382132 0.0003700889684927016
+        rotation 3.3072014113423897e-07 0.1731001223167848 0.9849042327322007 6.283177533285065
         children [
           DEF WHEEL_ROT Pose {
             rotation 0 -1 0 1.5708
@@ -195,8 +201,8 @@ DEF TWO_WHEEL_DRIVE Robot {
         }
       ]
       endPoint Solid {
-        translation -0.18122 0.165474 0
-        rotation -1 0 0 0
+        translation -0.1812200344335425 0.16548097978928442 -3.894646882513918e-06
+        rotation 6.022189540981501e-07 -0.08393372258056107 0.9964713393838314 6.283177498231785
         children [
           USE WHEEL_ROT
         ]
