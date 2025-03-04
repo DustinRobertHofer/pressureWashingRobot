@@ -40,8 +40,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation -0.19817575948630212 0.8721319130219557 0.4473391271068192 1.7678318732164682
-  position 1.2046446826120651 -3.2752487437531186 12.34343859273745
+  orientation -0.2224720309648819 0.8820315998243458 0.4153630368119749 1.8949632597697268
+  position 2.633159514691371 -1.5798989128156216 11.279101428717913
 }
 TexturedBackground {
 }
@@ -63,7 +63,7 @@ StraightRoadSegment {
   contactMaterial "FloorContact"
 }
 OilBarrel {
-  translation -0.01 1.67 0.44
+  translation 1.33 1.67 0.44
   physics Physics {
     density -1
     mass 50
@@ -74,7 +74,7 @@ DEF TWO_WHEEL_DRIVE Robot {
   children [
     RobotisLds01 {
       translation 0 0.16 0.11
-      rotation 0 0 1 1.5708
+      rotation 0 0 1 -1.5707953071795862
       name "laser"
     }
     DistanceSensor {

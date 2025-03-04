@@ -175,10 +175,75 @@ class SLAMManager:
         """Get a cleaning boundary from the SLAM map"""
         return self.slam.get_cleaning_boundary()
     
+    def set_cleaning_boundary(self, boundary_points):
+        """Set the cleaning boundary on the SLAM map
+        
+        Args:
+            boundary_points: List of dictionaries with 'x' and 'y' coordinates defining the boundary
+        """
+        # Convert boundary points to pixels on the map
+        size_pixels = self.slam.map.size_pixels
+        center = self.slam.map.center
+        pixels_per_meter = self.slam.map.pixels_per_meter
+        
+        # Mark the boundary in the map
+        for i in range(len(boundary_points)):
+            # Convert meters to pixels
+            x1 = int(center + boundary_points[i]['x'] * pixels_per_meter)
+            y1 = int(center + boundary_points[i]['y'] * pixels_per_meter)
+            
+            # Get the next point (wrapping around to the first point)
+            next_idx = (i + 1) % len(boundary_points)
+            x2 = int(center + boundary_points[next_idx]['x'] * pixels_per_meter)
+            y2 = int(center + boundary_points[next_idx]['y'] * pixels_per_meter)
+            
+            # Draw a line between these points as a boundary
+            self._draw_boundary_line(x1, y1, x2, y2)
+        
+        print(f"Added cleaning boundary with {len(boundary_points)} points to SLAM map")
+        return True
+        
+    def _draw_boundary_line(self, x1, y1, x2, y2):
+        """Draw a boundary line between two points using Bresenham's algorithm
+        
+        The boundary is marked on the map as occupied (value 100)
+        """
+        # Use the internal _bresenham_line method to get the points along the line
+        line_points = self.slam.map._bresenham_line(x1, y1, x2, y2)
+        
+        # Mark these points as boundaries (occupied) in the map
+        for x, y in line_points:
+            if 0 <= x < self.slam.map.size_pixels and 0 <= y < self.slam.map.size_pixels:
+                self.slam.map.grid[y, x] = 100  # 100 indicates occupied space
+    
     def is_position_free(self, x, y):
         """Check if a position is free according to the map"""
         occupancy = self.slam.get_occupancy(x, y)
         return occupancy == -1  # -1 indicates free space
+    
+    def display_map_periodic(self, current_time, time_interval=5.0):
+        """Display the map periodically based on the time interval
+        
+        Args:
+            current_time: Current simulation time in seconds
+            time_interval: Time interval between map displays in seconds (default: 5.0)
+        
+        Returns:
+            bool: True if map was displayed, False otherwise
+        """
+        # Initialize last display time if not already set
+        if not hasattr(self, 'last_map_display_time'):
+            self.last_map_display_time = 0
+            
+        # Check if enough time has passed since the last display
+        if current_time - self.last_map_display_time >= time_interval:
+            # Display the map
+            self.display_map()
+            # Update last display time
+            self.last_map_display_time = current_time
+            return True
+            
+        return False
     
     def generate_cleaning_path_from_map(self):
         """Generate a cleaning path from the SLAM map"""
