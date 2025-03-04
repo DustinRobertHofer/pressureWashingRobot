@@ -40,7 +40,7 @@ class Map:
         """Update map using LiDAR scan data from current robot position"""
         # Convert robot position from meters to pixels
         robot_x = int(self.center + x * self.pixels_per_meter)
-        robot_y = int(self.center + y * self.pixels_per_meter)
+        robot_y = int(self.center - y * self.pixels_per_meter)  # Negate y for consistent coordinate system
         
         # Mark robot's position as free space
         if 0 <= robot_x < self.size_pixels and 0 <= robot_y < self.size_pixels:
@@ -70,7 +70,7 @@ class Map:
             # Calculate endpoint of the ray (safely convert to int)
             try:
                 end_x = robot_x + int(distance_pixels * math.cos(angle))
-                end_y = robot_y + int(distance_pixels * math.sin(angle))
+                end_y = robot_y - int(distance_pixels * math.sin(angle))  # Negate sine component for y
             except (ValueError, OverflowError):
                 # Skip this ray if calculation fails
                 print(f"Warning: Invalid ray calculation for distance={distance}")
@@ -144,23 +144,24 @@ class Map:
         
     def get_meter(self, x, y):
         """Get the occupancy value at coordinates in meters"""
-        # Convert meters to pixels
+        # Convert meters to pixels with flipped y-coordinate
         pix_x = int(self.center + x * self.pixels_per_meter)
-        pix_y = int(self.center + y * self.pixels_per_meter)
+        pix_y = int(self.center - y * self.pixels_per_meter)  # Negate y for consistent coordinate system
         return self.get_pixel(pix_x, pix_y)
     
     def display(self, robot_x=None, robot_y=None, robot_theta=None):
         """Display the map using matplotlib and optionally save it"""
         plt.figure(figsize=(10, 10))
         
-        # Display the grid with proper scaling
-        plt.imshow(self.grid, cmap='gray_r', origin='lower')
+        # Display the grid with origin at the top left to fix mirroring issue
+        # Change from 'origin=lower' to 'origin=upper'
+        plt.imshow(self.grid, cmap='gray_r', origin='upper')
         
         # Mark robot position if provided
         if robot_x is not None and robot_y is not None:
             # Convert robot position from meters to pixels
             robot_pix_x = self.center + robot_x * self.pixels_per_meter
-            robot_pix_y = self.center + robot_y * self.pixels_per_meter
+            robot_pix_y = self.center - robot_y * self.pixels_per_meter  # Negate y to match flipped coordinate system
             
             # Draw robot as a red dot
             plt.plot(robot_pix_x, robot_pix_y, 'ro', markersize=10)
@@ -169,7 +170,7 @@ class Map:
             if robot_theta is not None:
                 direction_length = 20  # Length of direction indicator in pixels
                 dx = direction_length * math.cos(robot_theta)
-                dy = direction_length * math.sin(robot_theta)
+                dy = -direction_length * math.sin(robot_theta)  # Negate dy to match flipped coordinate system
                 plt.arrow(robot_pix_x, robot_pix_y, dx, dy, 
                           head_width=8, head_length=10, fc='red', ec='red')
         
@@ -266,8 +267,9 @@ class SimpleSLAM:
         
         min_x_m = (min_x - center) / pixels_per_meter
         max_x_m = (max_x - center) / pixels_per_meter
-        min_y_m = (min_y - center) / pixels_per_meter
-        max_y_m = (max_y - center) / pixels_per_meter
+        # Note the sign change for y coordinates to maintain consistency with flipped y-axis
+        min_y_m = (center - max_y) / pixels_per_meter
+        max_y_m = (center - min_y) / pixels_per_meter
         
         # Return corners of free space boundary
         return [

@@ -188,14 +188,14 @@ class SLAMManager:
         
         # Mark the boundary in the map
         for i in range(len(boundary_points)):
-            # Convert meters to pixels
+            # Convert meters to pixels, negate y to match flipped coordinate system
             x1 = int(center + boundary_points[i]['x'] * pixels_per_meter)
-            y1 = int(center + boundary_points[i]['y'] * pixels_per_meter)
+            y1 = int(center - boundary_points[i]['y'] * pixels_per_meter) # Negate y coordinate
             
             # Get the next point (wrapping around to the first point)
             next_idx = (i + 1) % len(boundary_points)
             x2 = int(center + boundary_points[next_idx]['x'] * pixels_per_meter)
-            y2 = int(center + boundary_points[next_idx]['y'] * pixels_per_meter)
+            y2 = int(center - boundary_points[next_idx]['y'] * pixels_per_meter) # Negate y coordinate
             
             # Draw a line between these points as a boundary
             self._draw_boundary_line(x1, y1, x2, y2)
