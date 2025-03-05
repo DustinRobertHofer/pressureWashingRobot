@@ -1,7 +1,8 @@
 import numpy as np
 import cv2
+from config.robot_config import ROBOT_PARAMS
 
-def generate_cleaning_path(boundary_points, surface_cleaner_diameter=12, path_overlap=3, edge_buffer=8):
+def generate_cleaning_path(boundary_points):
     """Generate a cleaning path from boundary points
     Args:
         boundary_points: List of dictionaries with 'x' and 'y' coordinates marking the boundary (in meters)
@@ -11,6 +12,10 @@ def generate_cleaning_path(boundary_points, surface_cleaner_diameter=12, path_ov
     Returns:
         List of waypoints for the robot to follow
     """
+    surface_cleaner_diameter = ROBOT_PARAMS['surface_cleaner_diameter']
+    path_overlap = ROBOT_PARAMS['path_overlap']
+    edge_buffer = ROBOT_PARAMS['edge_buffer']
+
     # Convert points to numpy arrays and from meters to feet
     np_points = []
     origin_x = boundary_points[0]['x']

@@ -1,6 +1,6 @@
-from .wheelSensors import WheelSensors
-from .digitalCompass import DigitalCompass
-from .distanceSensor import DistanceSensor
+from sensors.wheelSensors import WheelSensors
+from sensors.digitalCompass import DigitalCompass
+from sensors.distanceSensor import DistanceSensor
 
 class SensorManager:
     def __init__(self, robot, timestep):
