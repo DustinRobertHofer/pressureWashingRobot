@@ -129,7 +129,7 @@ class RobotController:
         
         # Visualize SLAM data periodically
         current_time = self.robot.getTime()
-        self.slam_manager.display_map_periodic(current_time, 5.0)
+        self.slam_manager.display_map_periodic(current_time, 10.0)
     
     def _process_navigation(self):
         """
@@ -141,11 +141,20 @@ class RobotController:
         # Get current position from SLAM
         current_state = self.slam_manager.get_position()
         
+        # Get obstacle information from sensor data
+        sensor_data = self.sensor_manager.get_sensor_data()
+        if 'distance' in sensor_data:
+            distance_value = sensor_data['distance']
+            obstacle_threshold = 0.5  # Distance in meters to consider as obstacle
+            current_state['obstacle_detected'] = distance_value < obstacle_threshold
+            current_state['obstacle_distance'] = distance_value
+            
+            # Log obstacle detection for debugging
+            if current_state['obstacle_detected']:
+                print(f"Obstacle detected at distance: {distance_value:.2f}m")
+        
         # Get next navigation command
         nav_command = self.navigator.get_next_command(current_state)
-        
-        # Handle obstacle detection
-        self._handle_obstacles()
         
         # Execute motion command
         self.motion_controller.execute_command(nav_command)
@@ -158,13 +167,6 @@ class RobotController:
         
         return None  # Continue execution
     
-    def _handle_obstacles(self):
-        """Handle obstacle detection and avoidance."""
-        if self.state.get_position().get('obstacle_detected', False):
-            obstacle_distance = self.state.get_position()['obstacle_distance']
-            print(f"Obstacle detected at distance: {obstacle_distance:.2f}m")
-            # Additional obstacle avoidance logic can be added here
-        
     def cleanup(self):
         """Perform any necessary cleanup operations before shutting down."""
         self.motion_controller.stop()
