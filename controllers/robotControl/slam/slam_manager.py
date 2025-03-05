@@ -94,7 +94,7 @@ class SLAMManager:
                     else:
                         scan_distances.append(value) # Keep valid measurements
                 
-                print(f"Using LiDAR data with {len(scan_distances)} points for SLAM update")
+               # print(f"Using LiDAR data with {len(scan_distances)} points for SLAM update")
             else:
                 print("LiDAR data available but ranges are empty")
         else:
@@ -124,7 +124,23 @@ class SLAMManager:
     
     def get_position(self):
         """Get the current position estimate from SLAM"""
-        return self.slam.get_position()
+        position = self.slam.get_position()
+        
+        # Get sensor data to check for obstacles
+        sensor_data = self.sensor_manager.get_sensor_data()
+        
+        # Add obstacle information if available from sensors
+        if 'distance' in sensor_data:
+            distance_value = sensor_data['distance']
+            # Use a threshold to determine if this is considered an obstacle
+            obstacle_threshold = 0.5  # Distance in meters to consider as obstacle
+            position['obstacle_detected'] = distance_value < obstacle_threshold
+            position['obstacle_distance'] = distance_value
+        else:
+            position['obstacle_detected'] = False
+            position['obstacle_distance'] = float('inf')
+            
+        return position
     
     def display_map(self):
         """Display the current map"""
@@ -159,7 +175,7 @@ class SLAMManager:
         except Exception as e:
             print(f"Error saving map image: {e}")
         
-        print(f"Map saved to {grid_filename} and {map_image}")
+       # print(f"Map saved to {grid_filename} and {map_image}")
         return True
         
     def load_map(self, filename="map"):
@@ -200,7 +216,7 @@ class SLAMManager:
             # Draw a line between these points as a boundary
             self._draw_boundary_line(x1, y1, x2, y2)
         
-        print(f"Added cleaning boundary with {len(boundary_points)} points to SLAM map")
+      #  print(f"Added cleaning boundary with {len(boundary_points)} points to SLAM map")
         return True
         
     def _draw_boundary_line(self, x1, y1, x2, y2):

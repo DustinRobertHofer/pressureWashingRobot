@@ -73,7 +73,7 @@ class Map:
                 end_y = robot_y - int(distance_pixels * math.sin(angle))  # Negate sine component for y
             except (ValueError, OverflowError):
                 # Skip this ray if calculation fails
-                print(f"Warning: Invalid ray calculation for distance={distance}")
+              #  print(f"Warning: Invalid ray calculation for distance={distance}")
                 continue
             
             # Check if endpoint is within map bounds
@@ -186,7 +186,7 @@ class Map:
         # Save the file
         map_file = os.path.join(maps_dir, f'slam_map_{timestamp}.png')
         plt.savefig(map_file)
-        print(f"Map saved to: {map_file}")
+        #print(f"Map saved to: {map_file}")
         
         # Show the map
         plt.show()
@@ -214,7 +214,7 @@ class SimpleSLAM:
         self.theta = odometry['theta']
         
         # Debug position
-        print(f"SLAM position update: x={self.x:.2f}, y={self.y:.2f}, θ={math.degrees(self.theta):.1f}°")
+    #   print(f"SLAM position update: x={self.x:.2f}, y={self.y:.2f}, θ={math.degrees(self.theta):.1f}°")
         
         # Skip map update if no scan data
         if scan_distances is None or len(scan_distances) == 0:

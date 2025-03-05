@@ -35,12 +35,12 @@ class LaserRangeSensor:
         # Get raw laser data if available
         ranges = None
         if self.laser:
-            try:
+            #try:
                 ranges = self.laser.getRangeImage()
-                if ranges and len(ranges) > 0:
-                    print(f"Received laser scan with {len(ranges)} points")
-            except Exception as e:
-                print(f"Error getting laser range data: {e}")
+                #if ranges and len(ranges) > 0:
+                  #  print(f"Received laser scan with {len(ranges)} points")
+           # except Exception as e:
+           #     print(f"Error getting laser range data: {e}")
         
         # Get point cloud if available
         points = None

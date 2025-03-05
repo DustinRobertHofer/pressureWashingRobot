@@ -8,6 +8,7 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/project
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/obstacles/protos/OilBarrel.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/appearances/protos/Plastic.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/devices/robotis/protos/RobotisLds01.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/factory/containers/protos/WoodenBox.proto"
 
 WorldInfo {
   info [
@@ -40,8 +41,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation -0.2224720309648819 0.8820315998243458 0.4153630368119749 1.8949632597697268
-  position 2.633159514691371 -1.5798989128156216 11.279101428717913
+  orientation 0.44845689516989734 0.8764861596837764 -0.17509547412015408 1.6966757860185184
+  position -0.8733969078887072 -2.0280770374032953 11.560285488859195
 }
 TexturedBackground {
 }
@@ -64,6 +65,30 @@ StraightRoadSegment {
 }
 OilBarrel {
   translation 1.33 1.67 0.44
+  physics Physics {
+    density -1
+    mass 50
+  }
+}
+OilBarrel {
+  translation 1.33 2.94 0.44
+  name "oil barrel(1)"
+  physics Physics {
+    density -1
+    mass 50
+  }
+}
+OilBarrel {
+  translation 2.42 0.2 0.44
+  name "oil barrel(2)"
+  physics Physics {
+    density -1
+    mass 50
+  }
+}
+OilBarrel {
+  translation 0.93 1.67 0.44
+  name "oil barrel(3)"
   physics Physics {
     density -1
     mass 50
@@ -221,4 +246,7 @@ DEF TWO_WHEEL_DRIVE Robot {
     mass 1
   }
   controller "robotControl"
+}
+WoodenBox {
+  translation -0.26 2.93 0.3
 }

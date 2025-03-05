@@ -38,7 +38,7 @@ class SensorManager:
             # Check if we actually got range data
             ranges = laser_data.get('ranges')
             if ranges is not None:
-                print(f"Found laser sensor with {len(ranges) if ranges else 0} data points")
+               # print(f"Found laser sensor with {len(ranges) if ranges else 0} data points")
                 self.sensor_data['laser'] = laser_data
             else:
                 print("Laser sensor found but no range data available")
