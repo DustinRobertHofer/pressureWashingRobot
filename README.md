@@ -2,7 +2,7 @@
 
 A complete simulation-based project for an autonomous pressure washing robot that can efficiently clean large surfaces while following optimized cleaning paths.
 
-![Pressure Washing Robot Simulation](worlds/.Rectangle_Arena.jpg)
+![Pressure Washing Robot CAD Model](assets/robotCAD.png)
 
 ## Project Overview
 
@@ -13,23 +13,41 @@ This project implements an autonomous robot system designed for pressure washing
 3. Efficiently covers surfaces with minimal overlap between cleaning passes
 4. Provides detailed simulation through Webots robotics simulator
 
+![Pressure Washing Robot Simulation](worlds/.Rectangle_Arena.jpg)
+
 ## Project Structure
 
 ```
-├── controllers/            # Robot control logic
-│   ├── robotControl/       # Main robot controller
-│   │   ├── actuators/      # Motor and water pump controls
-│   │   ├── config/         # Robot configuration settings
-│   │   ├── navigation/     # Path navigation logic
-│   │   ├── sensors/        # Sensor input processing
-│   │   ├── utils/          # Utility functions
-│   │   └── robotControl.py # Main controller code
-│   └── scripts/
-│       └── pathGeneration/ # Path planning algorithms
-│           └── PathGenerator.py # Latest path generation algorithm
-├── worlds/                 # Webots simulation worlds
-│   └── Rectangle_Arena.wbt # Main simulation environment
-└── .gitignore              # Git ignore file
+├── assets/                     # Project assets
+│   └── robotCAD.png            # Robot CAD model image
+├── controllers/                # Robot control logic
+│   └── robotControl/           # Main robot controller
+│       ├── actuators/          # Motor and actuator control modules
+│       │   └── motor.py        # Motor control interface
+│       ├── config/             # Configuration settings
+│       │   └── robot_config.py # Robot parameters and cleaning areas
+│       ├── navigation/         # Path navigation logic
+│       │   └── navigator.py    # Navigation control system (4.0KB)
+│       ├── sensors/            # Sensor input processing
+│       │   ├── distanceSensor.py  # Proximity detection
+│       │   ├── laserRange.py      # Laser rangefinder interface
+│       │   ├── wheelSensors.py    # Wheel encoder interface
+│       │   └── digitalCompass.py  # Orientation detection
+│       ├── utils/              # Utility modules
+│       │   ├── motionController.py # Movement control system
+│       │   ├── path_planner.py     # Path planning utilities
+│       │   ├── sensorManager.py    # Sensor data aggregation
+│       │   └── state.py            # Robot state tracking
+│       └── robotControl.py     # Main controller entry point (3.3KB)
+├── scripts/                    # Standalone scripts
+│   └── pathGeneration/         # Path generation tools and algorithms
+│       ├── PathGenerator.py    # Current production path generator (25KB)
+│       ├── PathGeneratorV1.py  # Initial path generator implementation
+│       ├── PathGeneratorV2.py  # Improved path generator
+│       └── PathGeneratorV3.py  # Enhanced path generator with obstacle avoidance
+├── worlds/                     # Webots simulation worlds
+│   └── Rectangle_Arena.wbt     # Main simulation environment
+└── .gitignore                  # Git ignore file
 ```
 
 ## Features
@@ -111,13 +129,6 @@ The project includes a sophisticated path generation algorithm that:
 4. Provides buffer distance from edges
 5. Optimizes total cleaning time
 
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## Acknowledgments
 
