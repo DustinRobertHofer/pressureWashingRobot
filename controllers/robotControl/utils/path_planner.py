@@ -6,9 +6,6 @@ def generate_cleaning_path(boundary_points):
     """Generate a cleaning path from boundary points
     Args:
         boundary_points: List of dictionaries with 'x' and 'y' coordinates marking the boundary (in meters)
-        surface_cleaner_diameter: Diameter of cleaning head in inches
-        path_overlap: Overlap between passes in inches
-        edge_buffer: Buffer from edges in inches
     Returns:
         List of waypoints for the robot to follow
     """
@@ -34,21 +31,21 @@ def generate_cleaning_path(boundary_points):
     # Convert points to inches
     points_inches = np.array(points) * 12
 
-    # Calculate path using similar logic to the original PathGenerator
-    path_coordinates = _calculate_path(points_inches, surface_cleaner_diameter, path_overlap, edge_buffer)
+    # Calculate path using rectilinear path generator
+    path_coordinates = _calculate_rectilinear_path(points_inches, surface_cleaner_diameter, path_overlap, edge_buffer)
     
     # Convert path coordinates back to meters and to waypoint format
     waypoints = []
-    for i in range(0, len(path_coordinates), 2):
+    for point in path_coordinates:
         # Convert from inches to meters (1 inch = 0.0254 meters)
-        x_meters = path_coordinates[i]['x'] * 0.0254 + origin_x
-        y_meters = path_coordinates[i]['y'] * 0.0254 + origin_y
+        x_meters = point['x'] * 0.0254 + origin_x
+        y_meters = point['y'] * 0.0254 + origin_y
         waypoints.append({'x': x_meters, 'y': y_meters})
     
     return waypoints
 
-def _calculate_path(points_inches, surface_cleaner_diameter, path_overlap, edge_buffer):
-    """Internal function to calculate the cleaning path
+def _calculate_rectilinear_path(points_inches, surface_cleaner_diameter, path_overlap, edge_buffer):
+    """Calculate a rectilinear path that ensures complete coverage
     Returns coordinates in inches relative to the origin point
     """
     # Extract points
@@ -81,40 +78,88 @@ def _calculate_path(points_inches, surface_cleaner_diameter, path_overlap, edge_
     # Draw filled polygon
     cv2.fillPoly(mask, [np.array(image_points)], 255)
     
-    # Erode the mask by edge_buffer
+    # Erode the mask by edge_buffer to ensure the robot stays away from edges
     kernel_size = int(edge_buffer * scale / 2)
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (kernel_size, kernel_size))
     eroded_mask = cv2.erode(mask, kernel)
     
     # Calculate spacing between passes in pixels
-    spacing_pixels = int((surface_cleaner_diameter - path_overlap) * scale)
+    effective_width = surface_cleaner_diameter - path_overlap
+    spacing_pixels = int(effective_width * scale)
     
-    # Generate path coordinates
+    # Generate rectilinear path coordinates
     path_coords = []
-    y = padding
-    going_right = True
     
-    while y < height - padding:
-        # Find the start and end points of this row
-        row = eroded_mask[y,:]
-        if np.any(row):  # If there are any white pixels in this row
-            x_coords = np.where(row > 0)[0]
-            start_x = x_coords[0]
-            end_x = x_coords[-1]
-            
-            # Convert back to inches and add to path
-            if going_right:
-                path_coords.extend([
-                    {'x': (start_x - padding) / scale + min_x, 'y': (y - padding) / scale + min_y},
-                    {'x': (end_x - padding) / scale + min_x, 'y': (y - padding) / scale + min_y}
-                ])
-            else:
-                path_coords.extend([
-                    {'x': (end_x - padding) / scale + min_x, 'y': (y - padding) / scale + min_y},
-                    {'x': (start_x - padding) / scale + min_x, 'y': (y - padding) / scale + min_y}
-                ])
+    # Find the leftmost, rightmost, top and bottom points within the eroded mask
+    y_indices, x_indices = np.where(eroded_mask > 0)
+    if len(y_indices) == 0 or len(x_indices) == 0:
+        # No valid area to clean
+        return []
         
-        y += spacing_pixels
-        going_right = not going_right
+    min_pixel_x = np.min(x_indices)
+    max_pixel_x = np.max(x_indices)
+    min_pixel_y = np.min(y_indices)
+    max_pixel_y = np.max(y_indices)
+    
+    # Start from the bottom-left corner and move in a rectilinear pattern
+    current_y = min_pixel_y
+    moving_right = True
+    
+    while current_y <= max_pixel_y:
+        # Find the valid x-coordinates for this row
+        row = eroded_mask[current_y, :]
+        valid_x = np.where(row > 0)[0]
+        
+        if len(valid_x) > 0:
+            row_min_x = valid_x[0]
+            row_max_x = valid_x[-1]
+            
+            # Convert to inches for the path
+            min_inch_x = (row_min_x - padding) / scale + min_x
+            min_inch_y = (current_y - padding) / scale + min_y
+            max_inch_x = (row_max_x - padding) / scale + min_x
+            max_inch_y = (current_y - padding) / scale + min_y
+            
+            # Add path points for this row
+            if moving_right:
+                # Move to the leftmost point if this is the first row or we need to move up
+                if len(path_coords) == 0 or path_coords[-1]['y'] != min_inch_y:
+                    path_coords.append({'x': min_inch_x, 'y': min_inch_y})
+                # Move right
+                path_coords.append({'x': max_inch_x, 'y': max_inch_y})
+            else:
+                # Move to the rightmost point if we need to move up
+                if path_coords[-1]['y'] != min_inch_y:
+                    path_coords.append({'x': max_inch_x, 'y': max_inch_y})
+                # Move left
+                path_coords.append({'x': min_inch_x, 'y': min_inch_y})
+        
+        # Move to the next row
+        current_y += spacing_pixels
+        
+        if current_y <= max_pixel_y:
+            # If there's another row, prepare to move to it
+            new_row = eroded_mask[current_y, :]
+            new_valid_x = np.where(new_row > 0)[0]
+            
+            if len(new_valid_x) > 0:
+                new_row_min_x = new_valid_x[0]
+                new_row_max_x = new_valid_x[-1]
+                
+                # Convert to inches
+                new_min_inch_x = (new_row_min_x - padding) / scale + min_x
+                new_max_inch_x = (new_row_max_x - padding) / scale + min_x
+                new_inch_y = (current_y - padding) / scale + min_y
+                
+                # Create vertical segment to connect to the next row
+                if moving_right:
+                    # We're at the rightmost point, so add a point at the same x but next row y
+                    path_coords.append({'x': max_inch_x, 'y': new_inch_y})
+                else:
+                    # We're at the leftmost point, so add a point at the same x but next row y
+                    path_coords.append({'x': min_inch_x, 'y': new_inch_y})
+                
+                # Switch direction
+                moving_right = not moving_right
     
     return path_coords 

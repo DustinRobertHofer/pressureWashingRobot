@@ -27,11 +27,15 @@ class PathVisualizer:
         self.display_size = min(width, height)
         
         # Initialize colors
-        self.background_color = 0xFFFFFF  # White
+        self.background_color = 0xA9A9A9  # Dark Gray
         self.grid_color = 0xCCCCCC        # Light Gray
-        self.path_color = 0x0000FF        # Blue
+        self.path_color = 0x0000CC        # DarkBlue
+        self.path_horizontal_color = 0x00AAFF  # Blue for horizontal segments
+        self.path_vertical_color = 0x00AAFF    # Light blue for vertical segments
         self.robot_color = 0xFF0000       # Red
-        self.waypoint_color = 0x00AA00    # Green
+        self.waypoint_color = 0x006600    # Dark Green
+        self.waypoint_start_color = 0x008800  # Darker green for start
+        self.waypoint_end_color = 0xFF8800    # Orange for end
         
         # Path tracking
         self.path_points = []
@@ -154,14 +158,48 @@ class PathVisualizer:
         if not self.display or not waypoints:
             return
             
-        self.display.setColor(self.waypoint_color)
+        # Draw path segments connecting waypoints
+        for i in range(len(waypoints) - 1):
+            p1 = waypoints[i]
+            p2 = waypoints[i + 1]
+            
+            pixel1 = self.world_to_pixel(p1['x'], p1['y'])
+            pixel2 = self.world_to_pixel(p2['x'], p2['y'])
+            
+            # Determine if this is a horizontal or vertical segment
+            if abs(p1['y'] - p2['y']) < 0.01:  # Horizontal segment
+                self.display.setColor(self.path_horizontal_color)
+            else:  # Vertical segment
+                self.display.setColor(self.path_vertical_color)
+            
+            self.display.drawLine(pixel1[0], pixel1[1], pixel2[0], pixel2[1])
         
-        # Draw a small circle for each waypoint
-        radius = 3  # pixels
-        for point in waypoints:
+        # Draw waypoints as circles
+        radius = 2  # pixels
+        
+        # Draw normal waypoints
+        self.display.setColor(self.waypoint_color)
+        for i in range(1, len(waypoints) - 1):
+            point = waypoints[i]
             pixel = self.world_to_pixel(point['x'], point['y'])
             self.display.fillOval(pixel[0] - radius, pixel[1] - radius, 
                                  radius * 2, radius * 2)
+        
+        # Draw start waypoint with special color (larger)
+        if waypoints:
+            start_point = waypoints[0]
+            start_pixel = self.world_to_pixel(start_point['x'], start_point['y'])
+            self.display.setColor(self.waypoint_start_color)
+            self.display.fillOval(start_pixel[0] - radius*2, start_pixel[1] - radius*2, 
+                                radius * 4, radius * 4)
+        
+        # Draw end waypoint with special color (larger)
+        if len(waypoints) > 1:
+            end_point = waypoints[-1]
+            end_pixel = self.world_to_pixel(end_point['x'], end_point['y'])
+            self.display.setColor(self.waypoint_end_color)
+            self.display.fillOval(end_pixel[0] - radius*2, end_pixel[1] - radius*2, 
+                                radius * 4, radius * 4)
             
     def add_path_point(self, x, y):
         """Add a point to the robot's path

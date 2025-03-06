@@ -10,33 +10,33 @@ ROBOT_PARAMS = {
     'wheel_radius': 0.08,  # meters
     'wheel_distance': 0.40244,  # meters
     'surface_cleaner_diameter': 12,  # inches
-    'path_overlap': 3,  # inches
-    'edge_buffer': 8,  # inches
+    'path_overlap': 4,  # inches (increased from 3 for better coverage)
+    'edge_buffer': 6,  # inches (reduced from 8 to clean closer to edges)
 }
 
 # Motion Parameters
 MOTION_PARAMS = {
-    'max_linear_speed': 0.7,  # meters/second
+    'max_linear_speed': 0.6,  # meters/second (slightly reduced for better accuracy)
     'max_angular_speed': 0.5,  # radians/second
     
 }
 
 # Navigation Parameters
 NAVIGATION_PARAMS = {
-    'waypoint_threshold': 0.1,  # meters (distance to consider waypoint reached)
-    'heading_threshold': 0.1,  # radians (angle to consider heading aligned)
-    'turn_threshold': 0.05,  # radians (angle to consider turn in place)
+    'waypoint_threshold': 0.01,  # meters (distance to consider waypoint reached)
+    'heading_threshold': 0.01,  # radians (angle to consider heading aligned)
+    'turn_threshold': 0.01,  # radians (angle to consider turn in place)
     'avoidance_threshold': 0.5,  # meters (distance to consider obstacle)
     'safe_distance': 0.2,  # meters (distance to maintain while avoiding)
 }
-
+s
 # Visualization Parameters
 VISUALIZATION_PARAMS = {
     'enable': True,
     'window_name': 'Robot Path Visualization',
     'width': 500,
     'height': 500,
-    'update_interval': 5,  # Update visualization every N timesteps
+    'update_interval': 3,  # Update visualization more frequently (was 5)
 }
 
 # Cleaning Area Parameters

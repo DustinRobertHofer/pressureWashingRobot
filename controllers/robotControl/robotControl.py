@@ -42,7 +42,7 @@ class RobotController:
     def setup(self):
         """Perform any necessary setup operations"""
         # Get boundary points from config and set the cleaning path
-        self.boundary_points = CLEANING_AREAS['rectangle']  # Can easily switch to 'L_shape' or other patterns
+        self.boundary_points = CLEANING_AREAS['L_shape']  # Can easily switch to 'L_shape' or other patterns
         self.cleaning_path = generate_cleaning_path(self.boundary_points)
         self.navigator.set_path(self.cleaning_path)
         
