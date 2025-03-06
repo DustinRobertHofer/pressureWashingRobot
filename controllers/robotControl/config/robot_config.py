@@ -5,6 +5,8 @@ SIMULATION_PARAMS = {
 
 # Robot Physical Parameters
 ROBOT_PARAMS = {
+    'left_motor_name': 'left_wheel',
+    'right_motor_name': 'right_wheel',
     'wheel_radius': 0.08,  # meters
     'wheel_distance': 0.40244,  # meters
     'surface_cleaner_diameter': 12,  # inches
@@ -14,14 +16,18 @@ ROBOT_PARAMS = {
 
 # Motion Parameters
 MOTION_PARAMS = {
-    'max_linear_speed': 0.5,  # meters/second
-    'max_angular_speed': 1.0,  # radians/second
+    'max_linear_speed': 0.7,  # meters/second
+    'max_angular_speed': 0.5,  # radians/second
+    
 }
 
 # Navigation Parameters
 NAVIGATION_PARAMS = {
     'waypoint_threshold': 0.1,  # meters (distance to consider waypoint reached)
     'heading_threshold': 0.1,  # radians (angle to consider heading aligned)
+    'turn_threshold': 0.05,  # radians (angle to consider turn in place)
+    'avoidance_threshold': 0.5,  # meters (distance to consider obstacle)
+    'safe_distance': 0.2,  # meters (distance to maintain while avoiding)
 }
 
 # Cleaning Area Parameters

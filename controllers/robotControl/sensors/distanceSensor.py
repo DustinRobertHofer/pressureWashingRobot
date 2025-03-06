@@ -4,10 +4,17 @@ class DistanceSensor:
         # Get and enable the distance sensor
         self.sensor = robot.getDevice('distance sensor')
         
+        # If named sensor not found, try to get the first distance sensor
         if not self.sensor:
-            print("WARNING: Could not find distance sensor.")
-            return
-            
+            # Try to get any distance sensor (assumes only one distance sensor)
+            try:
+                # In some Webots versions, we can use this approach to get a sensor by index/type
+                self.sensor = robot.getDistanceSensor(0)
+            except:
+                # If that fails, print warning
+                print("WARNING: Could not find distance sensor.")
+                return
+        
         print("Successfully initialized distance sensor")
         self.sensor.enable(timestep)
         
