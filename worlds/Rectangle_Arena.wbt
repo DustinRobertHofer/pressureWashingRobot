@@ -39,15 +39,15 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation 0.5192329422489791 -0.5082484406134689 -0.687081271974026 4.475251319646919
-  position 2.178602778564323 -3.8440978412689857 12.908709477608095
+  orientation 0.4211813039547372 -0.4337234528706685 -0.7965489788010102 4.705925371586699
+  position -0.898187897136065 -16.324243324455374 22.781518529386187
 }
 TexturedBackground {
 }
 TexturedBackgroundLight {
 }
 StraightRoadSegment {
-  translation -0.39 2.5 0
+  translation -0.28 2.7 0
   name "road(1)"
   width 6
   numberOfLanes 1
@@ -79,7 +79,6 @@ DEF TWO_WHEEL_DRIVE Robot {
     DistanceSensor {
       translation 0 0.2 0
       rotation 0 0 1 1.570796327
-      name "distance sensor"
       children [
         DEF SENSOR Shape {
           appearance Plastic {
