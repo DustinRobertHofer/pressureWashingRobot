@@ -30,6 +30,15 @@ NAVIGATION_PARAMS = {
     'safe_distance': 0.2,  # meters (distance to maintain while avoiding)
 }
 
+# Visualization Parameters
+VISUALIZATION_PARAMS = {
+    'enable': True,
+    'window_name': 'Robot Path Visualization',
+    'width': 500,
+    'height': 500,
+    'update_interval': 5,  # Update visualization every N timesteps
+}
+
 # Cleaning Area Parameters
 CLEANING_AREAS = {
     'rectangle': [
