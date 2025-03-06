@@ -6,7 +6,8 @@ from utils.state import State
 from utils.path_planner import generate_cleaning_path
 from config.robot_config import (
     CLEANING_AREAS,
-    SIMULATION_PARAMS
+    SIMULATION_PARAMS,
+    NAVIGATION_PARAMS
 )
 
 class RobotController:
@@ -35,8 +36,22 @@ class RobotController:
         self.sensor_manager.update()
         self.state.update(self.sensor_manager.get_sensor_data())
         
-        # Get current state including obstacle information
+        # Get current state
         current_state = self.state.get_position()
+        
+        # Check for obstacles using distance sensor
+        sensor_data = self.sensor_manager.get_sensor_data()
+        if 'distance' in sensor_data:
+            # Log distance reading for debugging
+            print(f"Distance sensor reading: {sensor_data['distance']:.2f}m")
+            
+            # Stop if obstacle is too close
+            if sensor_data['distance'] < NAVIGATION_PARAMS['safe_distance']:
+                print(f"OBSTACLE DETECTED at {sensor_data['distance']:.2f}m! Stopping robot.")
+                self.motion_controller.stop()
+                return
+        else:
+            print("No distance sensor data available")
         
         # Get and execute navigation commands
         nav_command = self.navigator.get_next_command(current_state)

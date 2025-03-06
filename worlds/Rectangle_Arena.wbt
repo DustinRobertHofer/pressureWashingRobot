@@ -74,6 +74,7 @@ DEF TWO_WHEEL_DRIVE Robot {
     DistanceSensor {
       translation 0 0.2 0
       rotation 0 0 1 1.570796327
+      name "distance sensor"
       children [
         DEF SENSOR Shape {
           appearance Plastic {

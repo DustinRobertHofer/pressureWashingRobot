@@ -37,16 +37,16 @@ class MotionController:
             print("WARNING: Could not find motors. Robot will not be able to move.")
             return
         
-        # # Limit velocities to maximum values            
-        # if angular_velocity > self.max_angular_speed:
-        #     angular_velocity = self.max_angular_speed
-        # elif angular_velocity < -self.max_angular_speed:
-        #     angular_velocity = -self.max_angular_speed
+        # Limit velocities to maximum values            
+        if angular_velocity > self.max_angular_speed:
+            angular_velocity = self.max_angular_speed
+        elif angular_velocity < -self.max_angular_speed:
+            angular_velocity = -self.max_angular_speed
         
-        # if linear_velocity > self.max_linear_speed:
-        #     linear_velocity = self.max_linear_speed
-        # elif linear_velocity < -self.max_linear_speed:
-        #     linear_velocity = -self.max_linear_speed
+        if linear_velocity > self.max_linear_speed:
+            linear_velocity = self.max_linear_speed
+        elif linear_velocity < -self.max_linear_speed:
+            linear_velocity = -self.max_linear_speed
             
         # Convert to wheel velocities
         left_speed = (linear_velocity + angular_velocity * self.WHEEL_BASE / 2) / self.WHEEL_RADIUS
