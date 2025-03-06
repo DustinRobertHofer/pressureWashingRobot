@@ -8,4 +8,4 @@ orthographicViewHeight: 1
 textFiles: -1
 globalOptionalRendering: DistanceSensorRays
 consoles: Console:All:All
-renderingDevicePerspectives: front_wheel_drive:Robot Path Visualization;1;1;0.665779;0.317073
+renderingDevicePerspectives: front_wheel_drive:Robot Path Visualization;1;0.509363;0.665779;0.317073
