@@ -36,6 +36,8 @@ class PathVisualizer:
         self.waypoint_color = 0x006600    # Dark Green
         self.waypoint_start_color = 0x008800  # Darker green for start
         self.waypoint_end_color = 0xFF8800    # Orange for end
+        self.title_color = 0x000000       # Black for title text
+        self.label_color = 0x000000       # Black for labels
         
         # Path tracking
         self.path_points = []
@@ -44,6 +46,9 @@ class PathVisualizer:
         self.scale_factor = 1.0   # Will be calculated based on area size
         self.origin_x = 0.0
         self.origin_y = 0.0
+        
+        # Title of the visualization
+        self.title = "Pressure Washing Robot Cleaning Path"
         
         # Initialize display
         self.clear()
@@ -149,6 +154,17 @@ class PathVisualizer:
             
             self.display.drawLine(pixel1[0], pixel1[1], pixel2[0], pixel2[1])
     
+    def draw_title(self):
+        """Draw the title at the top of the visualization"""
+        if not self.display:
+            return
+            
+        self.display.setColor(self.title_color)
+        # Position title in the center top of the display
+        title_x = self.width // 2 - len(self.title) * 3  # Approximate centering
+        title_y = 20  # Position from top
+        self.display.drawText(self.title, title_x, title_y)
+        
     def draw_waypoints(self, waypoints):
         """Draw all the waypoints
         
@@ -192,6 +208,10 @@ class PathVisualizer:
             self.display.setColor(self.waypoint_start_color)
             self.display.fillOval(start_pixel[0] - radius*2, start_pixel[1] - radius*2, 
                                 radius * 4, radius * 4)
+            
+            # Add "START" label
+            self.display.setColor(self.label_color)
+            self.display.drawText("START", start_pixel[0] + radius*3, start_pixel[1] - radius)
         
         # Draw end waypoint with special color (larger)
         if len(waypoints) > 1:
@@ -200,6 +220,10 @@ class PathVisualizer:
             self.display.setColor(self.waypoint_end_color)
             self.display.fillOval(end_pixel[0] - radius*2, end_pixel[1] - radius*2, 
                                 radius * 4, radius * 4)
+                                
+            # Add "END" label
+            self.display.setColor(self.label_color)
+            self.display.drawText("END", end_pixel[0] + radius*3, end_pixel[1] - radius)
             
     def add_path_point(self, x, y):
         """Add a point to the robot's path
@@ -274,4 +298,52 @@ class PathVisualizer:
             self.draw_waypoints(waypoints)
             
         self.draw_path()
-        self.draw_robot(robot_x, robot_y, robot_theta) 
+        self.draw_robot(robot_x, robot_y, robot_theta)
+        
+        # Draw title last so it's on top
+        self.draw_title()
+        
+        # Add a legend
+        # self.draw_legend()
+        
+    def draw_legend(self):
+        """Draw a legend explaining the different colors and symbols"""
+        if not self.display:
+            return
+            
+        legend_x = 10
+        legend_y = 40
+        line_height = 15
+        
+        self.display.setColor(self.label_color)
+        
+        # Draw legend items
+        self.display.drawText("Legend:", legend_x, legend_y)
+        
+        # Robot
+        y_pos = legend_y + line_height
+        self.display.setColor(self.robot_color)
+        self.display.fillOval(legend_x, y_pos - 5, 10, 10)
+        self.display.setColor(self.label_color)
+        self.display.drawText("Robot", legend_x + 15, y_pos)
+        
+        # Path
+        y_pos += line_height
+        self.display.setColor(self.path_horizontal_color)
+        self.display.drawLine(legend_x, y_pos, legend_x + 10, y_pos)
+        self.display.setColor(self.label_color)
+        self.display.drawText("Cleaning Path", legend_x + 15, y_pos)
+        
+        # Start point
+        y_pos += line_height
+        self.display.setColor(self.waypoint_start_color)
+        self.display.fillOval(legend_x, y_pos - 5, 10, 10)
+        self.display.setColor(self.label_color)
+        self.display.drawText("Start Point", legend_x + 15, y_pos)
+        
+        # End point
+        y_pos += line_height
+        self.display.setColor(self.waypoint_end_color)
+        self.display.fillOval(legend_x, y_pos - 5, 10, 10)
+        self.display.setColor(self.label_color)
+        self.display.drawText("End Point", legend_x + 15, y_pos) 
