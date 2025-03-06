@@ -18,21 +18,36 @@ This project implements an autonomous robot system designed for pressure washing
 ## Project Structure
 
 ```
-├── assets/                 # Project assets
-│   └── robotCAD.png        # Robot CAD model image
-├── controllers/            # Robot control logic
-│   └── robotControl/       # Main robot controller
-│       ├── actuators/      # Motor and water pump controls
-│       ├── config/         # Robot configuration settings
-│       ├── navigation/     # Path navigation logic
-│       ├── sensors/        # Sensor input processing
-│       ├── utils/          # Utility functions
-│       └── robotControl.py # Main controller code
-├── scripts/                # Standalone scripts
-│   └── pathGeneration/     # Path generation tools and algorithms
-├── worlds/                 # Webots simulation worlds
-│   └── Rectangle_Arena.wbt # Main simulation environment
-└── .gitignore              # Git ignore file
+├── assets/                     # Project assets
+│   └── robotCAD.png            # Robot CAD model image
+├── controllers/                # Robot control logic
+│   └── robotControl/           # Main robot controller
+│       ├── actuators/          # Motor and actuator control modules
+│       │   └── motor.py        # Motor control interface
+│       ├── config/             # Configuration settings
+│       │   └── robot_config.py # Robot parameters and cleaning areas
+│       ├── navigation/         # Path navigation logic
+│       │   └── navigator.py    # Navigation control system (4.0KB)
+│       ├── sensors/            # Sensor input processing
+│       │   ├── distanceSensor.py  # Proximity detection
+│       │   ├── laserRange.py      # Laser rangefinder interface
+│       │   ├── wheelSensors.py    # Wheel encoder interface
+│       │   └── digitalCompass.py  # Orientation detection
+│       ├── utils/              # Utility modules
+│       │   ├── motionController.py # Movement control system
+│       │   ├── path_planner.py     # Path planning utilities
+│       │   ├── sensorManager.py    # Sensor data aggregation
+│       │   └── state.py            # Robot state tracking
+│       └── robotControl.py     # Main controller entry point (3.3KB)
+├── scripts/                    # Standalone scripts
+│   └── pathGeneration/         # Path generation tools and algorithms
+│       ├── PathGenerator.py    # Current production path generator (25KB)
+│       ├── PathGeneratorV1.py  # Initial path generator implementation
+│       ├── PathGeneratorV2.py  # Improved path generator
+│       └── PathGeneratorV3.py  # Enhanced path generator with obstacle avoidance
+├── worlds/                     # Webots simulation worlds
+│   └── Rectangle_Arena.wbt     # Main simulation environment
+└── .gitignore                  # Git ignore file
 ```
 
 ## Features
