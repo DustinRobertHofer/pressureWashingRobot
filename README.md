@@ -1,6 +1,6 @@
 # Pressure Washing Robot
 
-A complete simulation-based project for an autonomous pressure washing robot that can efficiently clean large surfaces while following optimized cleaning paths.
+A complete simulation-based project for an autonomous pressure washing robot that can efficiently clean large surfaces while following optimized rectilinear cleaning paths.
 
 ![Pressure Washing Robot CAD Model](assets/robotCAD.png)
 
@@ -8,10 +8,11 @@ A complete simulation-based project for an autonomous pressure washing robot tha
 
 This project implements an autonomous robot system designed for pressure washing large surfaces such as driveways, patios, or parking lots. The robot:
 
-1. Navigates through predefined areas using optimized cleaning patterns
+1. Navigates through predefined areas using optimized rectilinear cleaning patterns
 2. Avoids obstacles using distance sensors
-3. Efficiently covers surfaces with minimal overlap between cleaning passes
-4. Provides detailed simulation through Webots robotics simulator
+3. Efficiently covers surfaces with optimal overlap between cleaning passes
+4. Provides detailed simulation and path visualization through Webots robotics simulator
+5. Follows rectilinear paths with 90-degree turns for complete coverage
 
 ![Pressure Washing Robot Simulation](worlds/.Rectangle_Arena.jpg)
 
@@ -35,10 +36,11 @@ This project implements an autonomous robot system designed for pressure washing
 │       │   └── digitalCompass.py  # Orientation detection
 │       ├── utils/              # Utility modules
 │       │   ├── motionController.py # Movement control system
-│       │   ├── path_planner.py     # Path planning utilities
+│       │   ├── path_planner.py     # Rectilinear path planning
+│       │   ├── path_visualizer.py  # Path visualization interface
 │       │   ├── sensorManager.py    # Sensor data aggregation
 │       │   └── state.py            # Robot state tracking
-│       └── robotControl.py     # Main controller entry point (3.3KB)
+│       └── robotControl.py     # Main controller entry point
 ├── scripts/                    # Standalone scripts
 │   └── pathGeneration/         # Path generation tools and algorithms
 │       ├── PathGenerator.py    # Current production path generator (25KB)
@@ -52,12 +54,14 @@ This project implements an autonomous robot system designed for pressure washing
 
 ## Features
 
-- **Optimized Cleaning Path Generation**: Creates efficient cleaning paths to cover different surface shapes (rectangle, L-shape, etc.)
+- **Rectilinear Cleaning Path Generation**: Creates efficient cleaning paths with proper 90-degree turns to ensure complete coverage of different surface shapes (rectangle, L-shape, etc.)
+- **Real-time Path Visualization**: Shows the planned path, current position, and actual robot trajectory in a dedicated display window
 - **Obstacle Detection and Avoidance**: Uses distance sensors to detect and navigate around obstacles
 - **Configurable Cleaning Parameters**: 
   - Surface cleaner diameter
   - Path overlap percentage
   - Edge buffer distance
+  - Visualization settings
 - **Motion Control System**: Precise control of robot movement and cleaning mechanisms
 - **Simulation Environment**: Complete Webots simulation for testing and visualization
 
@@ -92,6 +96,29 @@ This project implements an autonomous robot system designed for pressure washing
    File > Open World > /path/to/pressureWashingRobot/worlds/Rectangle_Arena.wbt
    ```
 2. Click the "Play" button to start the simulation
+3. A visualization window will appear showing the robot's planned path, current position, and the path taken so far
+
+### Path Visualization
+
+The simulation includes a real-time path visualization window that shows:
+
+- Planned cleaning path with distinct colors for horizontal and vertical segments
+- Robot's current position and orientation (red circle with heading line)
+- Actual path taken by the robot (blue trail)
+- Area boundaries (black outline)
+- Start and end points (highlighted with special colors)
+
+You can adjust visualization settings in `controllers/robotControl/config/robot_config.py`:
+
+```python
+VISUALIZATION_PARAMS = {
+    'enable': True,               # Enable/disable visualization
+    'window_name': 'Robot Path Visualization',  # Display name in Webots
+    'width': 500,                 # Width in pixels
+    'height': 500,                # Height in pixels
+    'update_interval': 3,         # Update frequency (every N timesteps)
+}
+```
 
 ### Configuring Cleaning Areas
 
@@ -100,35 +127,53 @@ Cleaning areas can be configured in the `controllers/robotControl/config/robot_c
 ```python
 CLEANING_AREAS = {
     'rectangle': [
-        (0, 0),
-        (9, 0),
-        (9, 9),
-        (0, 9)
+        {'x': 0.0, 'y': 0.0},     # Starting point
+        {'x': 2.8, 'y': 0.0},     # Right edge
+        {'x': 2.8, 'y': 3.0},     # Top-right corner
+        {'x': 0.0, 'y': 3.0},     # Top-left corner
     ],
     'L_shape': [
-        # Define L-shape coordinates here
+        {'x': 0.0, 'y': 0.0},     # Starting point
+        {'x': 4.8, 'y': 0.0},     # Right edge of top
+        {'x': 4.8, 'y': 1.5},     # Top-right inner corner
+        {'x': 1.5, 'y': 1.5},     # Bottom-right inner corner
+        {'x': 1.5, 'y': 4.3},     # Top-right outer corner
+        {'x': 0.0, 'y': 4.3}      # Top-left corner
     ]
 }
 ```
 
+To switch between different shapes, edit the `robotControl.py` file at line 43:
+```python
+self.boundary_points = CLEANING_AREAS['rectangle']  # Change to 'L_shape' or other patterns
+```
+
 ### Adjusting Cleaning Parameters
 
-Path generation parameters can be adjusted in the path generator:
+Path generation parameters can be adjusted in the `robot_config.py` file:
 
-- Surface cleaner diameter (in inches)
-- Path overlap (in inches)
-- Edge buffer radius (in inches)
+```python
+ROBOT_PARAMS = {
+    # ...
+    'surface_cleaner_diameter': 12,  # Diameter of cleaning head in inches
+    'path_overlap': 4,               # Overlap between passes in inches  
+    'edge_buffer': 6,                # Buffer from edges in inches
+}
+```
 
-## Path Generation
+## Rectilinear Path Generation
 
-The project includes a sophisticated path generation algorithm that:
+The project includes a sophisticated rectilinear path generation algorithm that:
 
 1. Takes boundary points as input
-2. Calculates an efficient coverage pattern
-3. Ensures proper overlap between passes
-4. Provides buffer distance from edges
-5. Optimizes total cleaning time
+2. Calculates an efficient coverage pattern with 90-degree turns
+3. Creates horizontal cleaning passes connected by vertical transitions
+4. Ensures proper overlap between passes for complete coverage
+5. Provides buffer distance from edges
+6. Optimizes total cleaning time
+7. Adapts to different shaped areas (rectangular, L-shaped, etc.)
 
+The rectilinear pattern (similar to lawn mowing) ensures complete coverage without missing spots, in contrast to simple zigzag patterns that might leave gaps.
 
 ## Acknowledgments
 
