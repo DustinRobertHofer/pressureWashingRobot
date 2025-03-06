@@ -29,7 +29,7 @@ NAVIGATION_PARAMS = {
     'avoidance_threshold': 0.5,  # meters (distance to consider obstacle)
     'safe_distance': 0.2,  # meters (distance to maintain while avoiding)
 }
-s
+
 # Visualization Parameters
 VISUALIZATION_PARAMS = {
     'enable': True,
