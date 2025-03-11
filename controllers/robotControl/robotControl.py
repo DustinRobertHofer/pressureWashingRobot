@@ -5,6 +5,7 @@ from utils.sensorManager import SensorManager
 from utils.state import State
 from utils.path_planner import generate_cleaning_path
 from utils.path_visualizer import PathVisualizer
+from utils.wirelessCommunication import wirelessClient
 from config.robot_config import (
     CLEANING_AREAS,
     SIMULATION_PARAMS,
@@ -66,6 +67,14 @@ class RobotController:
                 self.boundary_points,
                 self.cleaning_path
             )
+
+        # Connect to User Interface
+        connectionStatus = wirelessClient.connectToServer('DESKTOP-HREQUAA', 8000)
+        while connectionStatus == 0: #0 = not connected to Server
+            connectionStatus = wirelessClient.connectToServer('DESKTOP-HREQUAA', 8000)
+            if connectionStatus == 1: #1 = successfully connected to Server
+                break
+
         
     def step(self):
         """Main control loop - called every timestep"""
@@ -81,6 +90,7 @@ class RobotController:
         if 'distance' in sensor_data:
             # Log distance reading for debugging
             print(f"Distance sensor reading: {sensor_data['distance']:.2f}m")
+            wirelessClient.sendData(f"Distance sensor reading: {sensor_data['distance']:.2f}m")
             
             # Stop if obstacle is too close
             if sensor_data['distance'] < NAVIGATION_PARAMS['safe_distance']:
