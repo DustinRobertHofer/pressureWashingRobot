@@ -1,5 +1,10 @@
 import customtkinter
 import numpy as np
+#from dataQueue import set_dataQueue
+import socket
+import threading
+
+#import TestServer
 
 class pointEntriesFrame(customtkinter.CTkFrame):
     def __init__(self, master):
@@ -243,16 +248,17 @@ class App(customtkinter.CTk):
         # self.checkbox_frame_1 = checkboxFrame(self, "Values", values=["value 1", "value 2", "value 3"])
         # self.checkbox_frame_1.grid(row=0, column=1, padx=10, pady=(10, 0), sticky="nsw")
 
-        # self.button = customtkinter.CTkButton(self, text="Start Server", command=self.startServer)
-        # self.button.grid(row=3, column=0, padx=10, pady=10, sticky="ew", columnspan=1)  
+        self.button = customtkinter.CTkButton(self, text="Set Points", command=self.set_points)
+        self.button.grid(row=3, column=0, padx=10, pady=10, sticky="ew", columnspan=1)  
         
 
         self.button = customtkinter.CTkButton(self, text="Start Cleaning", command=self.export_areaData)
         self.button.grid(row=3, column=1, padx=10, pady=10, sticky="ew", columnspan=2)  
 
-    # def set_points(self):
-    #     App.point_status = 1
-    #     return App.point_status
+    def set_points(self):
+        print("Set Points")
+        App.point_status = 1
+        return App.point_status
 
     # def set_cleaning_status(self):
     #     if App.cleaning_status_value == 0:
@@ -266,7 +272,9 @@ class App(customtkinter.CTk):
             area_Data = self.pointEntriesFrame.get()
         else:
             area_Data= []
-        print(area_Data)
+        #print(area_Data)
+
+        #set_dataQueue(area_Data)
 
         return area_Data
 
