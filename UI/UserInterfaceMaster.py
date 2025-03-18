@@ -8,8 +8,8 @@ if __name__ == "__main__":
     UI = 'UI/UserInterface.py'
     Server = 'UI/TestServer.py'
 
-    processUI = multiprocessing.Process(target=runScript, args=(UI,))
-    processServer = multiprocessing.Process(target=runScript, args=(Server,))
+    processUI = multiprocessing.Process(target=runScript, args=(Server,))
+    processServer = multiprocessing.Process(target=runScript, args=(UI,))
 
     processUI.start()
     processServer.start()

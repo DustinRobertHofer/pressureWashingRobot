@@ -5,8 +5,9 @@ from utils.sensorManager import SensorManager
 from utils.state import State
 from utils.path_planner import generate_cleaning_path
 from utils.path_visualizer import PathVisualizer
-import socket
-import time
+from utils.RobotClient import RobotClient
+from utils.RobotInterface import RobotInterface
+import threading
 from config.robot_config import (
     CLEANING_AREAS,
     SIMULATION_PARAMS,
@@ -29,8 +30,18 @@ class RobotController:
         # Initialize visualization if enabled
         self.visualizer = None
         self.cleaning_path = None
-        self.boundary_points = None
+        #self.boundary_points = None
         self.time_counter = 0
+
+        # Initialize the interface
+        self.robot_interface = RobotInterface.get_instance()
+        
+        # Initialize and start the client
+        self.client = RobotClient()
+        self.client_thread = threading.Thread(target=self.client.start)
+        self.client_thread.daemon = True  # Thread will exit when main program exits
+        self.client_thread.start()
+        print("RobotClient started automatically")
         
         if VISUALIZATION_PARAMS['enable']:
             self.visualizer = PathVisualizer(
@@ -40,11 +51,24 @@ class RobotController:
                 window_name=VISUALIZATION_PARAMS['window_name']
             )
 
+    def get_boundary_points(self):
+        """Get the current boundary points from the interface"""
+        return self.robot_interface.get_boundary_points()
+
     def setup(self):
         """Perform any necessary setup operations"""
-
-        # Get boundary points from config and set the cleaning path
-        self.boundary_points = CLEANING_AREAS['L_shape']  # Can easily switch to 'L_shape' or other patterns
+        
+        # Wait for boundary points to be received from the server
+        print("Waiting for boundary points from server...")
+        while True:
+            boundary_points = self.get_boundary_points()
+            if boundary_points is not None:
+                print("Boundary points received from server!")
+                self.boundary_points = boundary_points
+                break
+            self.robot.step(self.timestep)  # Step the simulation while waiting
+        
+        # Generate cleaning path and set up navigation
         self.cleaning_path = generate_cleaning_path(self.boundary_points)
         self.navigator.set_path(self.cleaning_path)
         
@@ -68,13 +92,20 @@ class RobotController:
                 self.boundary_points,
                 self.cleaning_path
             )
-        
+            
+        # Wait for start cleaning command
+        print("Waiting for start cleaning command...")
+        while True:
+            if self.client.get_cleaning_status():
+                print("Start cleaning command received! Beginning cleaning operation.")
+                break
+            self.robot.step(self.timestep)  # Step the simulation while waiting
+
     def step(self):
         """Main control loop - called every timestep"""
         # Update sensor readings and state
         self.sensor_manager.update()
         self.state.update(self.sensor_manager.get_sensor_data())
-        global client_socket
         
         # Get current state
         current_state = self.state.get_position()
@@ -84,8 +115,6 @@ class RobotController:
         if 'distance' in sensor_data:
             # Log distance reading for debugging
             #print(f"Distance sensor reading: {sensor_data['distance']:.2f}m")
-            data = (f"Distance sensor reading: {sensor_data['distance']:.2f}m")
-            self.send_to_server(client_socket, data)
             
             # Stop if obstacle is too close
             if sensor_data['distance'] < NAVIGATION_PARAMS['safe_distance']:
@@ -130,9 +159,6 @@ class RobotController:
                 
             self.robot.step(self.timestep)  # One final step to ensure everything is updated
             return -1  # Signal to main loop to exit
-    
-    def send_to_server(self, connection, data):
-        connection.send(data.encode())  
         
     def cleanup(self):
         """Perform any necessary cleanup operations"""
@@ -144,39 +170,13 @@ def main():
     robot = Robot()
     timestep = SIMULATION_PARAMS['basic_time_step']
     
-    # Create the controller
+    # Create and setup the controller
     controller = RobotController(robot, timestep)
-
-    host = socket.gethostname()
-    port = 5000
-    connectionStatus = 0
-
-    global client_socket
-    client_socket = socket.socket()
-    try:
-        client_socket.connect((host, port))
-        message = ("Hello Server")
-        client_socket.send(message.encode())
-        connectionStatus = 1
-    except socket.error as e:
-         print(f"Socket error: {e}")
-         connectionStatus = 0
-    except KeyboardInterrupt:
-        print("Client interrupted by user.")
-        connectionStatus = 0
-
-    # Setup the controller
     controller.setup()
     
     # Main control loop
     while robot.step(timestep) != -1:
-        if connectionStatus == 1:
-            data = client_socket.recv(1024).decode()
-            print(f"Received from server: {data}")
-            time.sleep(1)
         if controller.step() == -1:
-            client_socket.close()
-            connectionStatus = 0
             break
         
     controller.cleanup()

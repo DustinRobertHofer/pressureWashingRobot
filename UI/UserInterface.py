@@ -1,8 +1,7 @@
 import customtkinter
 import numpy as np
-#from dataQueue import set_dataQueue
-import socket
-import threading
+from ServerInterface import ServerInterface
+import json
 
 #import TestServer
 
@@ -14,6 +13,8 @@ class pointEntriesFrame(customtkinter.CTkFrame):
         self.combobox_value = "Rectangle"
         self.pointCoords = []
         self.areaData = []
+        self.server_interface = ServerInterface()  # Initialize server interface
+        self.current_area_data = None  # Store the current area data
 
         def update_point_entries(cleaningAreaType):
             if cleaningAreaType == "Rectangle":
@@ -107,7 +108,6 @@ class pointEntriesFrame(customtkinter.CTkFrame):
         update_point_entries("Rectangle")
 
     def get(self):
-        
         pointCoords = np.array([self.entry_1.get().split(","), self.entry_2.get().split(","), self.entry_3.get().split(","), self.entry_4.get().split(",")])
         float_pointCoords = pointCoords.astype(float)
         pointCoords_dict = []
@@ -115,7 +115,28 @@ class pointEntriesFrame(customtkinter.CTkFrame):
         for i in float_pointCoords:
             pointCoords_dict.append({'x': i[0], 'y': i[1]})
 
+        # Store the area data instead of sending it immediately
+        self.current_area_data = {
+            'type': 'area_data',
+            'shape': self.combobox_value,
+            'points': pointCoords_dict
+        }
+
         return pointCoords_dict
+
+    def send_area_data(self):
+        self.get()
+        """Send the stored area data to the server"""
+        if self.current_area_data is None:
+            print("No area data to send")
+            return False
+
+        if not self.server_interface.socket:
+            self.server_interface.connect()
+        
+        if self.server_interface.socket:
+            return self.server_interface.send_area_data(self.current_area_data)
+        return False
 
 class headingLocationFrame(customtkinter.CTkFrame):
     def __init__(self, master, values):
@@ -219,6 +240,27 @@ class entryFrame(customtkinter.CTkEntry):
             entry_values.append(entry.get())
         return entry_values 
 
+class WarningDialog(customtkinter.CTkToplevel):
+    def __init__(self, message):
+        super().__init__()
+        
+        # Set dialog properties
+        self.title("Warning")
+        self.geometry("300x150")
+        self.resizable(False, False)
+        
+        # Create and pack the message label
+        self.label = customtkinter.CTkLabel(self, text=message)
+        self.label.pack(pady=20, padx=20)
+        
+        # Create and pack the OK button
+        self.button = customtkinter.CTkButton(self, text="OK", command=self.destroy)
+        self.button.pack(pady=10)
+        
+        # Make the dialog modal
+        self.transient(self.master)
+        self.grab_set()
+
 class App(customtkinter.CTk):
 
     point_status = 0
@@ -252,12 +294,17 @@ class App(customtkinter.CTk):
         self.button.grid(row=3, column=0, padx=10, pady=10, sticky="ew", columnspan=1)  
         
 
-        self.button = customtkinter.CTkButton(self, text="Start Cleaning", command=self.export_areaData)
+        self.button = customtkinter.CTkButton(self, text="Start Cleaning", command=self.start_cleaning)
         self.button.grid(row=3, column=1, padx=10, pady=10, sticky="ew", columnspan=2)  
 
     def set_points(self):
-        print("Set Points")
-        App.point_status = 1
+        """Handle Set Points button press"""
+        print("Setting points...")
+        if self.pointEntriesFrame.send_area_data():
+            print("Area data sent successfully")
+            App.point_status = 1
+        else:
+            print("Failed to send area data")
         return App.point_status
 
     # def set_cleaning_status(self):
@@ -266,17 +313,29 @@ class App(customtkinter.CTk):
     #     else:
     #         App.cleaning_status_value = 0
 
-    def export_areaData(self):
-        area_Data = []
-        if App.point_status == 1:
-            area_Data = self.pointEntriesFrame.get()
+    def start_cleaning(self):
+        """Handle Start Cleaning button press"""
+        if not App.point_status:
+            # Create and show custom warning dialog
+            dialog = WarningDialog("Please set area coordinates first")
+            self.wait_window(dialog)  # Wait for the dialog to be closed
+            return
+            
+        # Send start cleaning command
+        start_command = {
+            'type': 'command',
+            'action': 'start_cleaning'
+        }
+        
+        if self.pointEntriesFrame.server_interface.socket:
+            try:
+                data = json.dumps(start_command)
+                self.pointEntriesFrame.server_interface.socket.sendall(data.encode('utf-8'))
+                print("Start cleaning command sent successfully")
+            except Exception as e:
+                print(f"Failed to send start command: {e}")
         else:
-            area_Data= []
-        #print(area_Data)
-
-        #set_dataQueue(area_Data)
-
-        return area_Data
+            print("Not connected to server")
 
     # def cleaning_status(self):
     #     return App.cleaning_status_value
