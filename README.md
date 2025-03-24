@@ -13,6 +13,7 @@ This project implements an autonomous robot system designed for pressure washing
 3. Efficiently covers surfaces with optimal overlap between cleaning passes
 4. Provides detailed simulation and path visualization through Webots robotics simulator
 5. Follows rectilinear paths with 90-degree turns for complete coverage
+6. User Interface communicates with the robot via websockets and TCP/IP connection
 
 ![Pressure Washing Robot Simulation](worlds/.Rectangle_Arena.jpg)
 
@@ -38,6 +39,8 @@ This project implements an autonomous robot system designed for pressure washing
 │       │   ├── motionController.py # Movement control system
 │       │   ├── path_planner.py     # Rectilinear path planning
 │       │   ├── path_visualizer.py  # Path visualization interface
+│       │   ├── RobotClient.py      # WebSocket client 
+│       │   ├── RobotInterface.py   # RobotClient/robotControl interface
 │       │   ├── sensorManager.py    # Sensor data aggregation
 │       │   └── state.py            # Robot state tracking
 │       └── robotControl.py     # Main controller entry point
@@ -47,6 +50,11 @@ This project implements an autonomous robot system designed for pressure washing
 │       ├── PathGeneratorV1.py  # Initial path generator implementation
 │       ├── PathGeneratorV2.py  # Improved path generator
 │       └── PathGeneratorV3.py  # Enhanced path generator with obstacle avoidance
+├── UI/                         # User Interface files
+|   |── ServerInterface.py      # UserInterface/TestServer interface
+|   |── TestServer.py           # Websocket server
+|   |── UserInterface.py        # UserInterface layout code
+│   └── UserInterfaceMaster.py  # Initializes UserInterface.py and TestServer.py simultaneously
 ├── worlds/                     # Webots simulation worlds
 │   └── Rectangle_Arena.wbt     # Main simulation environment
 └── .gitignore                  # Git ignore file
@@ -64,6 +72,7 @@ This project implements an autonomous robot system designed for pressure washing
   - Visualization settings
 - **Motion Control System**: Precise control of robot movement and cleaning mechanisms
 - **Simulation Environment**: Complete Webots simulation for testing and visualization
+- **UserInterface**: User interface integrated with WebSockets to allow for wireless control of robot
 
 ## Requirements
 
@@ -72,6 +81,7 @@ This project implements an autonomous robot system designed for pressure washing
 - Python packages:
   - numpy
   - opencv-python
+  - customtkinker
   - controller (Webots Python API)
 
 ## Installation
@@ -95,8 +105,12 @@ This project implements an autonomous robot system designed for pressure washing
    ```
    File > Open World > /path/to/pressureWashingRobot/worlds/Rectangle_Arena.wbt
    ```
-2. Click the "Play" button to start the simulation
-3. A visualization window will appear showing the robot's planned path, current position, and the path taken so far
+2. In the python editor, run the UserInterface.py script and wait for the User Interface window to open and the message "Server started. Waiting for connections..."to appear in the console
+3. In Webots, click the "Play" button to start the simulation. The client should automatically connect to the server and the messages "Connected to server at 127.0.0.1:5000" and "Client started and listening for data..." should appear in the WeBots console.
+4. In the User Interface window, select either the rectangular or L-Shaped area and input the point coordinates. Default point coordinates have been implemented for ease of testing. 
+4. In the User Interface window, click "Set Points" to send the point coordinates to the robot. The Real-Time Path Visualizer in WeBots should now display the area and generated cleanin path.
+5. In the User Interface window, click "Start Cleaning" to set the robot in motion. The robot should now begin following the generated cleaning path and all functions such as obstable detection should work.
+6. After the simulation is terminated, close the python terminal in the python editor to terminate the websocket server.
 
 ### Path Visualization
 
@@ -122,7 +136,7 @@ VISUALIZATION_PARAMS = {
 
 ### Configuring Cleaning Areas
 
-Cleaning areas can be configured in the `controllers/robotControl/config/robot_config.py` file:
+Cleaning areas are now set by the user in the User Interface window. The default coordinates for each type of cleaning area shape are show below:
 
 ```python
 CLEANING_AREAS = {
@@ -141,11 +155,6 @@ CLEANING_AREAS = {
         {'x': 0.0, 'y': 4.3}      # Top-left corner
     ]
 }
-```
-
-To switch between different shapes, edit the `robotControl.py` file at line 43:
-```python
-self.boundary_points = CLEANING_AREAS['rectangle']  # Change to 'L_shape' or other patterns
 ```
 
 ### Adjusting Cleaning Parameters
@@ -179,3 +188,5 @@ The rectilinear pattern (similar to lawn mowing) ensures complete coverage witho
 
 - Webots robot simulator by Cyberbotics
 - OpenCV for image processing functionality 
+- CustomTkinker for user interface construction
+- webSockets for wireless communication

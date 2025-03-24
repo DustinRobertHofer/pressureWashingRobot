@@ -2,8 +2,6 @@ import socket
 import json
 import threading
 import time
-import sys
-import os
 from utils.RobotInterface import RobotInterface
 
 class RobotClient:
