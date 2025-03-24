@@ -1,9 +1,9 @@
 import customtkinter
 import numpy as np
-from ServerInterface import ServerInterface
-import json
+import socket
+import time
 
-#import TestServer
+
 
 class pointEntriesFrame(customtkinter.CTkFrame):
     def __init__(self, master):
@@ -13,8 +13,6 @@ class pointEntriesFrame(customtkinter.CTkFrame):
         self.combobox_value = "Rectangle"
         self.pointCoords = []
         self.areaData = []
-        self.server_interface = ServerInterface()  # Initialize server interface
-        self.current_area_data = None  # Store the current area data
 
         def update_point_entries(cleaningAreaType):
             if cleaningAreaType == "Rectangle":
@@ -108,57 +106,15 @@ class pointEntriesFrame(customtkinter.CTkFrame):
         update_point_entries("Rectangle")
 
     def get(self):
-        if self.combobox_value == "Rectangle":
-            pointCoords = np.array([self.entry_1.get().split(","), self.entry_2.get().split(","), self.entry_3.get().split(","), self.entry_4.get().split(",")])
-            float_pointCoords = pointCoords.astype(float)
-            pointCoords_dict = []
-        elif self.combobox_value == "L-Shaped":
-            pointCoords = np.array([self.entry_1.get().split(","), self.entry_2.get().split(","), self.entry_3.get().split(","), self.entry_4.get().split(","), self.entry_5.get().split(","), self.entry_6.get().split(",")])
-            float_pointCoords = pointCoords.astype(float)
-            pointCoords_dict = []
-
+        
+        pointCoords = np.array([self.entry_1.get().split(","), self.entry_2.get().split(","), self.entry_3.get().split(","), self.entry_4.get().split(",")])
+        float_pointCoords = pointCoords.astype(float)
+        pointCoords_dict = []
+        
         for i in float_pointCoords:
             pointCoords_dict.append({'x': i[0], 'y': i[1]})
 
-        # Store the area data instead of sending it immediately
-        self.current_area_data = {
-            'type': 'area_data',
-            'shape': self.combobox_value,
-            'points': pointCoords_dict
-        }
-
         return pointCoords_dict
-
-    def send_area_data(self):
-        self.get()
-        """Send the stored area data to the server"""
-        if self.current_area_data is None:
-            print("No area data to send")
-            return False
-
-        if not self.server_interface.socket:
-            self.server_interface.connect()
-        
-        if self.server_interface.socket:
-            return self.server_interface.send_area_data(self.current_area_data)
-        return False
-
-class robotStatusFrame(customtkinter.CTkFrame):
-    def __init__(self, master):
-        super().__init__(master)
-        self.grid_columnconfigure(0, weight=1)
-
-        self.textbox_statusDisplay = customtkinter.CTkTextbox(self, width=100, height=40, corner_radius=6)
-        self.textbox_statusDisplay.grid(row=0, column=0, padx=10, pady=(10,10), sticky="ew")
-
-        def set_StatusDisplay(text, text_color):
-            self.text = text
-            self.text_color = text_color
-            self.textbox_statusDisplay.configure(state="normal")
-            self.textbox_statusDisplay.delete("0.0", customtkinter.END)
-            self.textbox_statusDisplay.insert("0.0", text=self.text, text_color=self.text_color)
-            self.textbox_statusDisplay.configure(state="disabled")
-        
 
 class headingLocationFrame(customtkinter.CTkFrame):
     def __init__(self, master, values):
@@ -197,27 +153,70 @@ class headingLocationFrame(customtkinter.CTkFrame):
         self.textbox_actualPoint.insert("0.0", text=self.values[3])
         self.textbox_actualPoint.configure(state="disabled")
         self.textbox_actualPoint.grid(row=4, column=1, padx=(0,10), pady=(10,10), sticky="ew")
+        
 
-class WarningDialog(customtkinter.CTkToplevel):
-    def __init__(self, message):
-        super().__init__()
-        
-        # Set dialog properties
-        self.title("Warning")
-        self.geometry("300x150")
-        self.resizable(False, False)
-        
-        # Create and pack the message label
-        self.label = customtkinter.CTkLabel(self, text=message)
-        self.label.pack(pady=20, padx=20)
-        
-        # Create and pack the OK button
-        self.button = customtkinter.CTkButton(self, text="OK", command=self.destroy)
-        self.button.pack(pady=10)
-        
-        # Make the dialog modal
-        self.transient(self.master)
-        self.grab_set()
+class checkboxFrame(customtkinter.CTkFrame):
+    def __init__(self, master, title, values):
+        super().__init__(master)
+        self.grid_columnconfigure(0, weight=1)
+        self.values = values
+        self.title = title
+        self.checkboxes = []
+
+        self.title = customtkinter.CTkLabel(self, text=self.title, fg_color="grey30", corner_radius=6)
+        self.title.grid(row=0, column=0, padx=10, pady=(10,0), sticky="ew")
+
+        for i, value in enumerate(self.values):
+            checkbox = customtkinter.CTkCheckBox(self, text=value)
+            checkbox.grid(row=i+1, column=0, padx=10, pady=(10, 0), sticky="w")
+            self.checkboxes.append(checkbox)
+
+    def get(self):
+        checked_checkboxes = []
+        for checkbox in self.checkboxes:
+            if checkbox.get() == 1:
+                checked_checkboxes.append(checkbox.cget('text'))
+        return checked_checkboxes
+
+class comboBoxFrame(customtkinter.CTkFrame):
+    def __init__(self, master, title, values):
+        super().__init__(master)
+        self.grid_columnconfigure(0, weight=1)
+        self.values = values
+        self.title = title
+
+        self.title = customtkinter.CTkLabel(self, text=self.title, fg_color="grey30", corner_radius=6)
+        self.title.grid(row=0, column=0, padx=10, pady=(10,0), sticky="ew")
+
+        self.combobox = customtkinter.CTkComboBox(self, values = values)
+        self.combobox.grid(row=1, column=0, padx=10, pady=(10, 0), sticky="w")
+
+        self.combobox.set(self.values[0])
+
+    def get(self):
+        combobox_value = self.combobox.get()
+        return combobox_value
+
+class entryFrame(customtkinter.CTkEntry):
+    def __init__(self, master, title, placeholder_texts):
+        super().__init__(master)
+        self.grid_columnconfigure(0, weight=1)
+        self.placeholder_texts = placeholder_texts
+        self.title = title
+        self.entries = []
+
+        self.title = customtkinter.CTkLabel(self, text=self.title, fg_color="grey30", corner_radius=6)
+        self.title.grid(row=0, column=0, padx=10, pady=(10,0), sticky="ew")
+
+        for i, value in enumerate(self.placeholder_texts):
+            entry = customtkinter.CTkEntry(self, placeholder_text=value)
+            entry.grid(row=i+1, column=0, padx=10, pady=(10, 0), sticky="w")
+            self.entries.append(entry)
+    def get(self):
+        entry_values = []
+        for entry in self.entries:
+            entry_values.append(entry.get())
+        return entry_values 
 
 class App(customtkinter.CTk):
 
@@ -226,77 +225,63 @@ class App(customtkinter.CTk):
 
     def __init__(self):
         super().__init__()
-    
+
         
 
         # Initialize UI and Define Title and Default Window Size
         self.title("Automated Designs")
         self.geometry("768x512")
         self.grid_columnconfigure((0, 1), weight=1)
-        self.grid_rowconfigure((0, 1, 2, 3, 4, 5, 6), weight=1)
+        self.grid_rowconfigure(0, weight=1)
         self.startcleaning = 0 #0 = false, 1 = true
         self.headingLocationValues = [90, 87, (10, 0), (9.8, 0.4)]
       
 
         # Create Cleaning Area Parameter Frame
-        self.robotStatusFrame = robotStatusFrame(self)
-        self.robotStatusFrame.grid(row=0, column=0, padx=(10, 10), pady=(10,0), sticky="new", columnspan=2)
-
         self.pointEntriesFrame = pointEntriesFrame(self)
-        self.pointEntriesFrame.grid(row=1, column=0, padx=(10, 10), pady=(0, 10), sticky="nw")
+        self.pointEntriesFrame.grid(row=0, column=0, padx=(0, 10), pady=10, sticky="nw")
 
         self.headingLocationFrame = headingLocationFrame(self, values=self.headingLocationValues)
-        self.headingLocationFrame.grid(row=1, column=1, padx=(10,10), pady=(0,10), sticky="nw")
+        self.headingLocationFrame.grid(row=0, column=1, padx=(0,10), pady=10, sticky="nw")
+
+        # self.checkbox_frame_1 = checkboxFrame(self, "Values", values=["value 1", "value 2", "value 3"])
+        # self.checkbox_frame_1.grid(row=0, column=1, padx=10, pady=(10, 0), sticky="nsw")
 
         self.button = customtkinter.CTkButton(self, text="Set Points", command=self.set_points)
-        self.button.grid(row=6, column=0, padx=10, pady=10, sticky="ew", columnspan=1)  
+        self.button.grid(row=3, column=0, padx=10, pady=10, sticky="ew", columnspan=1)  
         
 
-        self.button = customtkinter.CTkButton(self, text="Start Cleaning", command=self.start_cleaning)
-        self.button.grid(row=6, column=1, padx=10, pady=10, sticky="ew", columnspan=2)  
+        self.button = customtkinter.CTkButton(self, text="Start Cleaning", command=self.set_cleaning_status)
+        self.button.grid(row=3, column=1, padx=10, pady=10, sticky="ew", columnspan=2)  
 
     def set_points(self):
-        """Handle Set Points button press"""
-        print("Setting points...")
-        if self.pointEntriesFrame.send_area_data():
-            print("Area data sent successfully")
-            App.point_status = 1
-        else:
-            print("Failed to send area data")
+        App.point_status = 1
         return App.point_status
 
-    # def set_cleaning_status(self):
-    #     if App.cleaning_status_value == 0:
-    #         App.cleaning_status_value = 1
-    #     else:
-    #         App.cleaning_status_value = 0
-
-    def start_cleaning(self):
-        """Handle Start Cleaning button press"""
-        if not App.point_status:
-            # Create and show custom warning dialog
-            dialog = WarningDialog("Please set area coordinates first")
-            self.wait_window(dialog)  # Wait for the dialog to be closed
-            return
-            
-        # Send start cleaning command
-        start_command = {
-            'type': 'command',
-            'action': 'start_cleaning'
-        }
-        
-        if self.pointEntriesFrame.server_interface.socket:
-            try:
-                data = json.dumps(start_command)
-                self.pointEntriesFrame.server_interface.socket.sendall(data.encode('utf-8'))
-                print("Start cleaning command sent successfully")
-            except Exception as e:
-                print(f"Failed to send start command: {e}")
+    def set_cleaning_status(self):
+        if App.cleaning_status_value == 0:
+            App.cleaning_status_value = 1
         else:
-            print("Not connected to server")
+            App.cleaning_status_value = 0
 
-    # def cleaning_status(self):
-    #     return App.cleaning_status_value
+    def export_areaData(self):
+        area_Data = []
+        if App.point_status == 1:
+            area_Data = self.pointEntriesFrame.get()
+        else:
+            area_Data= []
+        print(area_Data)
+
+        return area_Data
+
+    def cleaning_status(self):
+        return App.cleaning_status_value
+
+
+
+    
+        
+
 
 app = App()
 app.mainloop()
