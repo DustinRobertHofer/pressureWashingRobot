@@ -29,7 +29,7 @@ class PathVisualizer:
         # Initialize colors
         self.background_color = 0xA9A9A9  # Dark Gray
         self.grid_color = 0xCCCCCC        # Light Gray
-        self.path_color = 0x0000CC        # DarkBlue
+        self.path_color = 0xCC0000        # Dark Red
         self.path_horizontal_color = 0x00AAFF  # Blue for horizontal segments
         self.path_vertical_color = 0x00AAFF    # Light blue for vertical segments
         self.robot_color = 0xFF0000       # Red
