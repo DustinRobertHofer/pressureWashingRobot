@@ -5,12 +5,17 @@ from utils.sensorManager import SensorManager
 from utils.state import State
 from utils.path_planner import generate_cleaning_path
 from utils.path_visualizer import PathVisualizer
+from utils.RobotClient import RobotClient
+from utils.RobotInterface import RobotInterface
+import threading
+import subprocess
 from config.robot_config import (
     CLEANING_AREAS,
     SIMULATION_PARAMS,
     NAVIGATION_PARAMS,
     VISUALIZATION_PARAMS
 )
+import os
 
 class RobotController:
     def __init__(self, robot, timestep):
@@ -27,8 +32,27 @@ class RobotController:
         # Initialize visualization if enabled
         self.visualizer = None
         self.cleaning_path = None
-        self.boundary_points = None
+        #self.boundary_points = None
         self.time_counter = 0
+
+        # Launch the UserInterfaceMaster.py in a separate process
+        print("Starting UserInterfaceMaster.py...")
+        # Get the path to the project root directory
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        project_root = os.path.abspath(os.path.join(current_dir, '../..'))
+        ui_master_path = os.path.join(project_root, 'UI', 'UserInterfaceMaster.py')
+        print(f"UserInterfaceMaster.py path: {ui_master_path}")
+        self.ui_process = subprocess.Popen(['python', ui_master_path])
+        
+        # Initialize the interface
+        self.robot_interface = RobotInterface.get_instance()
+        
+        # Initialize and start the client
+        self.client = RobotClient()
+        self.client_thread = threading.Thread(target=self.client.start)
+        self.client_thread.daemon = True  # Thread will exit when main program exits
+        self.client_thread.start()
+        print("RobotClient started automatically")
         
         if VISUALIZATION_PARAMS['enable']:
             self.visualizer = PathVisualizer(
@@ -38,11 +62,24 @@ class RobotController:
                 window_name=VISUALIZATION_PARAMS['window_name']
             )
 
+    def get_boundary_points(self):
+        """Get the current boundary points from the interface"""
+        return self.robot_interface.get_boundary_points()
 
     def setup(self):
         """Perform any necessary setup operations"""
-        # Get boundary points from config and set the cleaning path
-        self.boundary_points = CLEANING_AREAS['L_shape']  # Can easily switch to 'L_shape' or other patterns
+        
+        # Wait for boundary points to be received from the server
+        print("Waiting for boundary points from server...")
+        while True:
+            boundary_points = self.get_boundary_points()
+            if boundary_points is not None:
+                print("Boundary points received from server!")
+                self.boundary_points = boundary_points
+                break
+            self.robot.step(self.timestep)  # Step the simulation while waiting
+        
+        # Generate cleaning path and set up navigation
         self.cleaning_path = generate_cleaning_path(self.boundary_points)
         self.navigator.set_path(self.cleaning_path)
         
@@ -66,7 +103,15 @@ class RobotController:
                 self.boundary_points,
                 self.cleaning_path
             )
-        
+            
+        # Wait for start cleaning command
+        print("Waiting for start cleaning command...")
+        while True:
+            if self.client.get_cleaning_status():
+                print("Start cleaning command received! Beginning cleaning operation.")
+                break
+            self.robot.step(self.timestep)  # Step the simulation while waiting
+
     def step(self):
         """Main control loop - called every timestep"""
         # Update sensor readings and state
@@ -80,7 +125,7 @@ class RobotController:
         sensor_data = self.sensor_manager.get_sensor_data()
         if 'distance' in sensor_data:
             # Log distance reading for debugging
-            print(f"Distance sensor reading: {sensor_data['distance']:.2f}m")
+            #print(f"Distance sensor reading: {sensor_data['distance']:.2f}m")
             
             # Stop if obstacle is too close
             if sensor_data['distance'] < NAVIGATION_PARAMS['safe_distance']:
@@ -130,6 +175,11 @@ class RobotController:
         """Perform any necessary cleanup operations"""
         self.motion_controller.stop()
         
+        # Terminate the UI process if it's still running
+        if hasattr(self, 'ui_process') and self.ui_process is not None:
+            print("Terminating UserInterfaceMaster.py...")
+            self.ui_process.terminate()
+
 def main():
     """Main function to be called by Webots"""
     # Initialize the Robot with configured timestep
