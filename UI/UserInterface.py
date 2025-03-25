@@ -232,7 +232,7 @@ class App(customtkinter.CTk):
         # Initialize UI and Define Title and Default Window Size
         self.title("Automated Designs")
         #self.geometry("768x512")
-        self.geometry("340x430")
+        self.geometry("360x430")
         #self.grid_columnconfigure((0, 1), weight=1)
         self.grid_rowconfigure((0, 1, 2, 3, 4, 5, 6,7,8), weight=1)
         self.startcleaning = 0 #0 = false, 1 = true
