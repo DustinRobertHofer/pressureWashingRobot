@@ -8,12 +8,14 @@ from utils.path_visualizer import PathVisualizer
 from utils.RobotClient import RobotClient
 from utils.RobotInterface import RobotInterface
 import threading
+import subprocess
 from config.robot_config import (
     CLEANING_AREAS,
     SIMULATION_PARAMS,
     NAVIGATION_PARAMS,
     VISUALIZATION_PARAMS
 )
+import os
 
 class RobotController:
     def __init__(self, robot, timestep):
@@ -33,6 +35,15 @@ class RobotController:
         #self.boundary_points = None
         self.time_counter = 0
 
+        # Launch the UserInterfaceMaster.py in a separate process
+        print("Starting UserInterfaceMaster.py...")
+        # Get the path to the project root directory
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        project_root = os.path.abspath(os.path.join(current_dir, '../..'))
+        ui_master_path = os.path.join(project_root, 'UI', 'UserInterfaceMaster.py')
+        print(f"UserInterfaceMaster.py path: {ui_master_path}")
+        self.ui_process = subprocess.Popen(['python', ui_master_path])
+        
         # Initialize the interface
         self.robot_interface = RobotInterface.get_instance()
         
@@ -162,7 +173,12 @@ class RobotController:
         
     def cleanup(self):
         """Perform any necessary cleanup operations"""
-        self.motion_controller.stop()  
+        self.motion_controller.stop()
+        
+        # Terminate the UI process if it's still running
+        if hasattr(self, 'ui_process') and self.ui_process is not None:
+            print("Terminating UserInterfaceMaster.py...")
+            self.ui_process.terminate()
 
 def main():
     """Main function to be called by Webots"""

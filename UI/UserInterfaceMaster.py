@@ -1,20 +1,34 @@
 import multiprocessing
 import subprocess
+import os
+import sys
 
 def runScript(scriptName):
     subprocess.run(['python', scriptName])
 
 if __name__ == "__main__":
-    UI = 'UI/UserInterface.py'
-    Server = 'UI/TestServer.py'
+    # Get the absolute path to the directory containing this script
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    
+    # Define paths to UI and Server scripts
+    UI = os.path.join(current_dir, 'UserInterface.py')
+    Server = os.path.join(current_dir, 'TestServer.py')
 
-    processUI = multiprocessing.Process(target=runScript, args=(Server,))
-    processServer = multiprocessing.Process(target=runScript, args=(UI,))
+    # Create processes
+    processUI = multiprocessing.Process(target=runScript, args=(UI,))
+    processServer = multiprocessing.Process(target=runScript, args=(Server,))
 
-    processUI.start()
+    # Start server first
+    print("Starting TestServer.py...")
     processServer.start()
-
+    
+    # Start UI
+    print("Starting UserInterface.py...")
+    processUI.start()
+    
+    # Wait for both processes to complete
     processUI.join()
     processServer.join()
+    
 
     
