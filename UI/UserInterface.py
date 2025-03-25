@@ -226,34 +226,35 @@ class App(customtkinter.CTk):
 
     def __init__(self):
         super().__init__()
-    
+        
         
 
         # Initialize UI and Define Title and Default Window Size
         self.title("Automated Designs")
-        self.geometry("768x512")
-        self.grid_columnconfigure((0, 1), weight=1)
-        self.grid_rowconfigure((0, 1, 2, 3, 4, 5, 6), weight=1)
+        #self.geometry("768x512")
+        self.geometry("340x430")
+        #self.grid_columnconfigure((0, 1), weight=1)
+        self.grid_rowconfigure((0, 1, 2, 3, 4, 5, 6,7,8), weight=1)
         self.startcleaning = 0 #0 = false, 1 = true
         self.headingLocationValues = [90, 87, (10, 0), (9.8, 0.4)]
       
 
         # Create Cleaning Area Parameter Frame
-        self.robotStatusFrame = robotStatusFrame(self)
-        self.robotStatusFrame.grid(row=0, column=0, padx=(10, 10), pady=(10,0), sticky="new", columnspan=2)
+        # self.robotStatusFrame = robotStatusFrame(self)
+        # self.robotStatusFrame.grid(row=0, column=0, padx=(10, 10), pady=(10,0), sticky="new", columnspan=2)
 
         self.pointEntriesFrame = pointEntriesFrame(self)
-        self.pointEntriesFrame.grid(row=1, column=0, padx=(10, 10), pady=(0, 10), sticky="nw")
+        self.pointEntriesFrame.grid(row=1, column=0, padx=(10, 10), pady=(10, 10), sticky="nw")
 
-        self.headingLocationFrame = headingLocationFrame(self, values=self.headingLocationValues)
-        self.headingLocationFrame.grid(row=1, column=1, padx=(10,10), pady=(0,10), sticky="nw")
+        # self.headingLocationFrame = headingLocationFrame(self, values=self.headingLocationValues)
+        # self.headingLocationFrame.grid(row=1, column=1, padx=(10,10), pady=(0,10), sticky="nw")
 
         self.button = customtkinter.CTkButton(self, text="Set Points", command=self.set_points)
-        self.button.grid(row=6, column=0, padx=10, pady=10, sticky="ew", columnspan=1)  
+        self.button.grid(row=6, column=0, padx=10, pady=10, sticky="ew")  
         
 
-        self.button = customtkinter.CTkButton(self, text="Start Cleaning", command=self.start_cleaning)
-        self.button.grid(row=6, column=1, padx=10, pady=10, sticky="ew", columnspan=2)  
+        self.button = customtkinter.CTkButton(self, text="Start Cleaning",height=40, command=self.start_cleaning)
+        self.button.grid(row=7, column=0, padx=10, pady=10, sticky="ew", rowspan=2)  
 
     def set_points(self):
         """Handle Set Points button press"""
@@ -295,8 +296,7 @@ class App(customtkinter.CTk):
         else:
             print("Not connected to server")
 
-    # def cleaning_status(self):
-    #     return App.cleaning_status_value
+        self.destroy()
 
 app = App()
 app.mainloop()
