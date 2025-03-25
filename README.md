@@ -81,7 +81,7 @@ This project implements an autonomous robot system designed for pressure washing
 - Python packages:
   - numpy
   - opencv-python
-  - customtkinker
+  - customtkinter (UI framework)
   - controller (Webots Python API)
 
 ## Installation
@@ -105,7 +105,6 @@ This project implements an autonomous robot system designed for pressure washing
    ```
    File > Open World > /path/to/pressureWashingRobot/worlds/Rectangle_Arena.wbt
    ```
-2. In the python editor, run the UserInterface.py script and wait for the User Interface window to open and the message "Server started. Waiting for connections..."to appear in the console
 3. In Webots, click the "Play" button to start the simulation. The client should automatically connect to the server and the messages "Connected to server at 127.0.0.1:5000" and "Client started and listening for data..." should appear in the WeBots console.
 4. In the User Interface window, select either the rectangular or L-Shaped area and input the point coordinates. Default point coordinates have been implemented for ease of testing. 
 4. In the User Interface window, click "Set Points" to send the point coordinates to the robot. The Real-Time Path Visualizer in WeBots should now display the area and generated cleanin path.
@@ -187,6 +186,6 @@ The rectilinear pattern (similar to lawn mowing) ensures complete coverage witho
 ## Acknowledgments
 
 - Webots robot simulator by Cyberbotics
-- OpenCV for image processing functionality 
+- OpenCV for the path visualization 
 - CustomTkinker for user interface construction
 - webSockets for wireless communication
