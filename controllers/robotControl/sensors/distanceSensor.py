@@ -1,8 +1,8 @@
 class DistanceSensor:
-    def __init__(self, robot, timestep):
+    def __init__(self, robot, timestep, sensor_name):
         """Initialize distance sensor"""
         # Get and enable the distance sensor
-        self.sensor = robot.getDevice('distance sensor')
+        self.sensor = robot.getDevice(sensor_name)
         
         # If named sensor not found, try to get the first distance sensor
         if not self.sensor:

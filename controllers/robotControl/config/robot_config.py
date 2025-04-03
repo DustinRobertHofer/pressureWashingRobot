@@ -1,3 +1,9 @@
+# Operation Mode
+OPERATION_MODE = {
+    'use_ui': False,  # Set to True to use UI for area selection, False to use predefined cleaning areas
+    'default_area': 'rectangle'  # Default cleaning area to use when use_ui is False
+}
+
 # Physics Simulation Parameters
 SIMULATION_PARAMS = {
     'basic_time_step': 32,  # milliseconds (increased from default for better stability)
@@ -5,6 +11,10 @@ SIMULATION_PARAMS = {
 
 # Robot Physical Parameters
 ROBOT_PARAMS = {
+    'sensor_height' : 0.17145, #meters
+    'sensor_pitch' : 0.637549, #radians
+    'sensor_yaw' : 0.7368, #radians
+    'sensor_offset' : 0.09652, #meters
     'left_motor_name': 'left_wheel',
     'right_motor_name': 'right_wheel',
     'wheel_radius': 0.08,  # meters
@@ -27,7 +37,7 @@ NAVIGATION_PARAMS = {
     'heading_threshold': 0.01,  # radians (angle to consider heading aligned)
     'turn_threshold': 0.01,  # radians (angle to consider turn in place)
     'avoidance_threshold': 0.5,  # meters (distance to consider obstacle)
-    'safe_distance': 0.2,  # meters (distance to maintain while avoiding)
+    'safe_distance': 0.075,  # meters (distance to maintain while avoiding)
 }
 
 # Visualization Parameters

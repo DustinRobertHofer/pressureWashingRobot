@@ -39,8 +39,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation -0.19533365921651138 -0.20863425658139567 0.958288322248485 4.643108398012239
-  position 1.0880987083709992 15.071386271288835 5.536822153420264
+  orientation 0.3221645517792361 -0.20977235371300756 -0.9231498043083739 4.831053179148183
+  position 0.6048143255918677 -3.7470302873081307 2.982991427140733
 }
 TexturedBackground {
 }
@@ -62,7 +62,7 @@ StraightRoadSegment {
   contactMaterial "FloorContact"
 }
 OilBarrel {
-  translation 4.62 1.67 0.44
+  translation 0.36 2.03 0.44
   physics Physics {
     density -1
     mass 50
@@ -71,13 +71,67 @@ OilBarrel {
 DEF TWO_WHEEL_DRIVE Robot {
   translation 0 0 0.082
   children [
+    DEF LASER DistanceSensor {
+      translation -0.08 0.2 0.12065
+      rotation -0.004200002505379588 -0.6543618900767092 -0.7561698729744472 -2.130885001079161
+      children [
+        DEF SENSOR Shape {
+          appearance Plastic {
+          }
+          geometry Box {
+            size 0.01 0.01 0.01
+          }
+        }
+      ]
+      name "left_laser"
+      boundingObject USE SENSOR
+      physics Physics {
+      }
+      lookupTable [
+        0 0 0
+        2 1000 0
+      ]
+    }
+    DEF LASER DistanceSensor {
+      translation 0.08 0.2 0.12065
+      rotation -0.00429979299144952 -0.6543684961871082 -0.7561635953800294 -0.9743
+      children [
+        DEF SENSOR Shape {
+          appearance Plastic {
+          }
+          geometry Box {
+            size 0.01 0.01 0.01
+          }
+        }
+      ]
+      name "right_laser"
+      boundingObject USE SENSOR
+      physics Physics {
+      }
+      lookupTable [
+        0 0 0
+        2 1000 0
+      ]
+    }
+    DEF ElecBox Solid {
+      translation 0 0.15 0.085325
+      children [
+        Shape {
+          appearance PBRAppearance {
+          }
+          geometry Box {
+            size 0.1778 0.1 0.07065
+          }
+        }
+      ]
+    }
     Display {
       name "Robot Path Visualization"
       width 500
       height 500
     }
-    DistanceSensor {
-      translation 0 0.2 0
+    DEF LASER DistanceSensor {
+      translation 0 0.2 0.03
       rotation 0 0 1 1.570796327
       children [
         DEF SENSOR Shape {
@@ -88,6 +142,7 @@ DEF TWO_WHEEL_DRIVE Robot {
           }
         }
       ]
+      name "forward_laser"
       boundingObject USE SENSOR
       physics Physics {
       }
@@ -95,7 +150,6 @@ DEF TWO_WHEEL_DRIVE Robot {
         0 0 0
         2 1000 0
       ]
-      type "sonar"
     }
     Solid {
       translation 0 -0.2 -0.03
