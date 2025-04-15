@@ -1,6 +1,6 @@
 from time import sleep
 from gpiozero import PWMOutputDevice, DigitalOutputDevice, DigitalInputDevice
-from hardware.pi_config import MOTOR_PINS, MOTION_PARAMS, ROBOT_PARAMS
+from config.robotConfig import MOTOR_PINS, MOTION_PARAMS, ROBOT_PARAMS
 
 class PiMotor:
     """Motor controller for Raspberry Pi using gpiozero."""

@@ -26,6 +26,11 @@ class Navigator:
         self.MAX_LINEAR_SPEED = MOTION_PARAMS['max_linear_speed']
         self.MAX_ANGULAR_SPEED = MOTION_PARAMS['max_angular_speed']
         
+        # Add missing parameters for obstacle avoidance
+        self.SAFE_DISTANCE = NAVIGATION_PARAMS['safe_distance']
+        self.AVOIDANCE_TURN_ANGLE = pi/2  # 90 degrees in radians, perpendicular to current path
+        self.avoidance_direction = 1  # 1 for left, -1 for right
+        
     def normalize_angle(self, angle):
         """
         Normalize angle to the range [-pi, pi].

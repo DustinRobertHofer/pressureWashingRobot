@@ -1,5 +1,5 @@
 from actuators.motor import PiMotor
-from config.robot_config import MOTION_PARAMS, ROBOT_PARAMS
+from config.robotConfig import MOTION_PARAMS, ROBOT_PARAMS
 
 class PiMotionController:
     """Motion controller for Raspberry Pi using gpiozero-controlled motors."""
