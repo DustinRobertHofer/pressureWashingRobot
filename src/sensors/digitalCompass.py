@@ -1,7 +1,7 @@
 import math
 import time
 import smbus
-from hardware.pi_config import SENSOR_PINS
+from config.robotConfig import SENSOR_PINS
 
 class PiCompass:
     """Digital compass implementation for Raspberry Pi using HMC5883L."""

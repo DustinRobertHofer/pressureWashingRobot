@@ -1,7 +1,7 @@
 import time
 import serial
 import smbus
-from hardware.pi_config import SENSOR_PINS
+from config.robotConfig import SENSOR_PINS
 
 class PiLaserRangeFinder:
     """Laser range finder implementation for Raspberry Pi."""
