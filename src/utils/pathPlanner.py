@@ -1,5 +1,5 @@
 import math
-from config.robot_config import ROBOT_PARAMS
+from config.robotConfig import ROBOT_PARAMS
 
 def generate_cleaning_path(boundary_points, path_overlap=None):
     """
