@@ -5,15 +5,12 @@ from utils.sensorManager import SensorManager
 from utils.state import State
 from utils.path_planner import generate_cleaning_path
 from utils.path_visualizer import PathVisualizer
-from utils.RobotClient import RobotClient
-from utils.RobotInterface import RobotInterface
-import threading
-import subprocess
-import os
+
 from config.robot_config import (
     SIMULATION_PARAMS,
     NAVIGATION_PARAMS,
-    VISUALIZATION_PARAMS
+    VISUALIZATION_PARAMS,
+    CLEANING_AREAS  # Import the cleaning areas from config
 )
 
 
@@ -25,14 +22,16 @@ class RobotController:
         
         # Initialize core components
         self._init_subsystems()
-        self._init_ui()
-        self._init_communication()
         self._init_visualization()
         
         # Initialize state variables
         self.cleaning_path = None
         self.boundary_points = None
         self.time_counter = 0
+        
+        # Set the cleaning area directly from robot_config
+        self.selected_area = 'rectangle'  # Default to rectangle area
+        self.boundary_points = CLEANING_AREAS[self.selected_area]
 
     def _init_subsystems(self):
         """Initialize robot subsystems"""
@@ -40,27 +39,6 @@ class RobotController:
         self.state = State(self.robot, self.timestep)
         self.motion_controller = MotionController(self.robot, self.timestep)
         self.navigator = Navigator(self.robot, self.timestep)
-
-    def _init_ui(self):
-        """Initialize and launch the UI"""
-        print("Starting UserInterfaceMaster.py...")
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        project_root = os.path.abspath(os.path.join(current_dir, '../..'))
-        ui_master_path = os.path.join(project_root, 'UI', 'UserInterfaceMaster.py')
-        print(f"UserInterfaceMaster.py path: {ui_master_path}")
-        self.ui_process = subprocess.Popen(['python', ui_master_path])
-
-    def _init_communication(self):
-        """Initialize communication interfaces"""
-        # Initialize the interface
-        self.robot_interface = RobotInterface.get_instance()
-        
-        # Initialize and start the client
-        self.client = RobotClient()
-        self.client_thread = threading.Thread(target=self.client.start)
-        self.client_thread.daemon = True
-        self.client_thread.start()
-        print("RobotClient started automatically")
 
     def _init_visualization(self):
         """Initialize visualization if enabled"""
@@ -72,21 +50,6 @@ class RobotController:
                 height=VISUALIZATION_PARAMS['height'],
                 window_name=VISUALIZATION_PARAMS['window_name']
             )
-
-    def get_boundary_points(self):
-        """Get the current boundary points from the interface"""
-        return self.robot_interface.get_boundary_points()
-
-    def _wait_for_boundary_points(self):
-        """Wait until boundary points are received from the server"""
-        print("Waiting for boundary points from server...")
-        while True:
-            boundary_points = self.get_boundary_points()
-            if boundary_points is not None:
-                print("Boundary points received from server!")
-                self.boundary_points = boundary_points
-                break
-            self.robot.step(self.timestep)
 
     def _setup_visualization(self):
         """Setup visualization parameters"""
@@ -119,27 +82,20 @@ class RobotController:
             self.cleaning_path
         )
 
-    def _wait_for_start_command(self):
-        """Wait for start cleaning command from the client"""
-        print("Waiting for start cleaning command...")
-        while True:
-            if self.client.get_cleaning_status():
-                print("Start cleaning command received! Beginning cleaning operation.")
-                break
-            self.robot.step(self.timestep)
-
     def setup(self):
         """Perform necessary setup operations before starting cleaning"""
-        # Get boundary points and setup path
-        self._wait_for_boundary_points()
+        # Use the boundary points directly from config and setup path
+        print(f"Using cleaning area: {self.selected_area}")
+        print(f"Boundary points: {self.boundary_points}")
+        
         self.cleaning_path = generate_cleaning_path(self.boundary_points)
         self.navigator.set_path(self.cleaning_path)
         
         # Setup visualization
         self._setup_visualization()
         
-        # Wait for start command
-        self._wait_for_start_command()
+        # No need to wait for start command, immediately begin
+        print("Starting cleaning operation automatically...")
 
     def _check_obstacles(self, sensor_data):
         """Check for obstacles using sensor data and handle if needed"""
@@ -193,23 +149,14 @@ class RobotController:
 
     def _handle_completion(self, current_state):
         """Handle completion of the cleaning operation"""
-        print("Path completed. Cleaning operation finished.")
-        
-        # Final visualization update
-        if self.visualizer:
-            self._update_visualization(current_state)
-            
-        self.robot.step(self.timestep)  # One final step to ensure everything is updated
-        return -1  # Signal to main loop to exit
+        print("Path completed. Cleaning operation finished!")
+        return True
 
     def cleanup(self):
         """Perform any necessary cleanup operations"""
         self.motion_controller.stop()
         
-        # Terminate the UI process if it's still running
-        if hasattr(self, 'ui_process') and self.ui_process is not None:
-            print("Terminating UserInterfaceMaster.py...")
-            self.ui_process.terminate()
+        # No UI process to terminate anymore
 
 
 def main():
@@ -225,7 +172,7 @@ def main():
     # Main control loop
     while robot.step(timestep) != -1:
         result = controller.step()
-        if result == -1:
+        if result:
             break
         
     controller.cleanup()
