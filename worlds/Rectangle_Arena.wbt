@@ -39,8 +39,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation 0.3221645517792361 -0.20977235371300756 -0.9231498043083739 4.831053179148183
-  position 0.6048143255918677 -3.7470302873081307 2.982991427140733
+  orientation 0.29338489230797166 -0.15675701950886792 -0.9430548986141456 4.737496815477644
+  position 1.8451161579201514 -8.097674659930982 4.304897771401528
 }
 TexturedBackground {
 }
@@ -62,7 +62,7 @@ StraightRoadSegment {
   contactMaterial "FloorContact"
 }
 OilBarrel {
-  translation 0.36 2.03 0.44
+  translation 3.19 2.03 0.44
   physics Physics {
     density -1
     mass 50
