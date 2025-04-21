@@ -13,7 +13,9 @@ import os
 from config.robot_config import (
     SIMULATION_PARAMS,
     NAVIGATION_PARAMS,
-    VISUALIZATION_PARAMS
+    VISUALIZATION_PARAMS,
+    OPERATION_MODE,
+    CLEANING_AREAS
 )
 
 
@@ -25,13 +27,22 @@ class RobotController:
         
         # Initialize core components
         self._init_subsystems()
-        self._init_ui()
-        self._init_communication()
+        
+        # Check operation mode and initialize UI only if needed
+        if OPERATION_MODE['use_ui']:
+            self._init_ui()
+            self._init_communication()
+        else:
+            # When not using UI, we still need to have a reference to the interface
+            self.robot_interface = RobotInterface.get_instance()
+            # Set boundary points directly from config
+            self.boundary_points = CLEANING_AREAS[OPERATION_MODE['default_area']]
+            print(f"Using predefined cleaning area: {OPERATION_MODE['default_area']}")
+        
         self._init_visualization()
         
         # Initialize state variables
         self.cleaning_path = None
-        self.boundary_points = None
         self.time_counter = 0
 
     def _init_subsystems(self):
@@ -75,10 +86,18 @@ class RobotController:
 
     def get_boundary_points(self):
         """Get the current boundary points from the interface"""
+        # If not using UI, return the predefined boundary points
+        if not OPERATION_MODE['use_ui']:
+            return self.boundary_points
         return self.robot_interface.get_boundary_points()
 
     def _wait_for_boundary_points(self):
         """Wait until boundary points are received from the server"""
+        # If not using UI, we already have the boundary points
+        if not OPERATION_MODE['use_ui']:
+            print(f"Using predefined boundary points from configuration")
+            return
+            
         print("Waiting for boundary points from server...")
         while True:
             boundary_points = self.get_boundary_points()
@@ -121,6 +140,11 @@ class RobotController:
 
     def _wait_for_start_command(self):
         """Wait for start cleaning command from the client"""
+        # If not using UI, start immediately
+        if not OPERATION_MODE['use_ui']:
+            print("Auto-starting cleaning operation (UI disabled)")
+            return
+            
         print("Waiting for start cleaning command...")
         while True:
             if self.client.get_cleaning_status():
@@ -143,13 +167,13 @@ class RobotController:
 
     def _check_obstacles(self, sensor_data):
         """Check for obstacles using sensor data and handle if needed"""
-        if 'distance' not in sensor_data:
-            print("No distance sensor data available")
-            return False
+        # if 'distance' not in sensor_data:
+        #     print("No distance sensor data available")
+        #     return False
             
         # Stop if obstacle is too close
-        if sensor_data['distance'] < NAVIGATION_PARAMS['safe_distance']:
-            print(f"OBSTACLE DETECTED at {sensor_data['distance']:.2f}m! Stopping robot.")
+        if sensor_data['forward_distance'] < NAVIGATION_PARAMS['safe_distance'] or sensor_data['left_fwd_distance'] < NAVIGATION_PARAMS['safe_distance'] or sensor_data['right_fwd_distance'] < NAVIGATION_PARAMS['safe_distance']:
+            print(f"OBSTACLE DETECTED at {sensor_data['forward_distance']:.2f}m! Stopping robot.")
             self.motion_controller.stop()
             return True
         
@@ -206,8 +230,8 @@ class RobotController:
         """Perform any necessary cleanup operations"""
         self.motion_controller.stop()
         
-        # Terminate the UI process if it's still running
-        if hasattr(self, 'ui_process') and self.ui_process is not None:
+        # Terminate the UI process if it's running
+        if OPERATION_MODE['use_ui'] and hasattr(self, 'ui_process') and self.ui_process is not None:
             print("Terminating UserInterfaceMaster.py...")
             self.ui_process.terminate()
 

@@ -7,4 +7,4 @@ centralWidgetVisible: 1
 orthographicViewHeight: 1
 textFiles: -1
 globalOptionalRendering: DistanceSensorRays
-renderingDevicePerspectives: front_wheel_drive:Robot Path Visualization;1;1.14;0.656663;0.00220264
+renderingDevicePerspectives: front_wheel_drive:Robot Path Visualization;1;0.523366;0.656663;0.00220264

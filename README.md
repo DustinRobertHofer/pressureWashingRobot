@@ -74,6 +74,34 @@ This project implements an autonomous robot system designed for pressure washing
 - **Simulation Environment**: Complete Webots simulation for testing and visualization
 - **UserInterface**: User interface integrated with WebSockets to allow for wireless control of robot
 
+## Sensor System
+
+The robot is equipped with three types of sensors that work together to enable autonomous navigation and obstacle avoidance:
+
+1. **Distance Sensors (Laser Range Finders)**:
+   - Three laser range finders positioned at the front, left, and right of the robot
+   - Measure distances up to 2 meters with millimeter precision
+   - Used for obstacle detection and wall following
+   - Convert raw distance measurements into forward and side distances for navigation
+
+2. **Wheel Encoders**:
+   - Measure wheel rotation on both left and right wheels
+   - Convert encoder ticks to distance traveled (8cm wheel radius)
+   - Track individual wheel movements for precise motion control
+   - Calculate forward motion and turning angles
+
+3. **Digital Compass**:
+   - Provides absolute heading information in radians
+   - Used for maintaining correct orientation during navigation
+   - Converts raw compass values to heading angles in the range [0, 2π]
+   - Essential for accurate path following and turns
+
+These sensors work together through the SensorManager class, which:
+- Aggregates data from all sensors
+- Performs necessary calculations and conversions
+- Provides a unified interface for the navigation system
+- Updates readings every simulation timestep
+
 ## Requirements
 
 - Python 3.8+
