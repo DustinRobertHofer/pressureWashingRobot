@@ -36,8 +36,8 @@ class RobotController:
             # When not using UI, we still need to have a reference to the interface
             self.robot_interface = RobotInterface.get_instance()
             # Set boundary points directly from config
-            self.boundary_points = CLEANING_AREAS[OPERATION_MODE['default_area']]
-            print(f"Using predefined cleaning area: {OPERATION_MODE['default_area']}")
+            self.boundary_points = CLEANING_AREAS[OPERATION_MODE['use_ui']]
+            print(f"Using predefined cleaning area: {OPERATION_MODE['use_ui']}")
         
         self._init_visualization()
         

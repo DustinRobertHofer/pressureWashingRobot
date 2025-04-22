@@ -1,6 +1,6 @@
 # Operation Mode
 OPERATION_MODE = {
-    'use_ui': False,  # Set to True to use UI for area selection, False to use predefined cleaning areas
+    'use_ui': True,  # Set to True to use UI for area selection, False to use predefined cleaning areas
     'default_area': 'rectangle'  # Default cleaning area to use when use_ui is False
 }
 
