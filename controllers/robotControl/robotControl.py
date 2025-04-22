@@ -48,7 +48,9 @@ class RobotController:
     def _init_subsystems(self):
         """Initialize robot subsystems"""
         self.sensor_manager = SensorManager(self.robot, self.timestep)
-        self.state = State(self.robot, self.timestep)
+        self.sensor_manager.update()
+        sensor_data = self.sensor_manager.get_sensor_data()
+        self.state = State(self.robot, self.timestep, sensor_data['compass_heading'])
         self.motion_controller = MotionController(self.robot, self.timestep)
         self.navigator = Navigator(self.robot, self.timestep)
 

@@ -1,12 +1,12 @@
 from math import cos, sin, pi
 
 class State:
-    def __init__(self, robot, timestep):
+    def __init__(self, robot, timestep, compass_heading):
         """Initialize state tracking system"""
         self.x = 0.0  # X position in meters
         self.y = 0.0  # Y position in meters
         self.theta = 0.0  # Heading in radians
-        
+        self.compass_heading_offset = compass_heading
         # Parameters for turn detection
         self.prev_theta = 0.0
         self.TURN_THRESHOLD = 0.01  # About 0.57 degrees in radians
@@ -24,7 +24,7 @@ class State:
         
         # Update heading
         self.prev_theta = self.theta
-        self.theta = self.normalize_angle(compass_heading)
+        self.theta = self.normalize_angle(compass_heading - self.compass_heading_offset)
         
         # Check if turning
         is_turning = abs(self.theta - self.prev_theta) > self.TURN_THRESHOLD
