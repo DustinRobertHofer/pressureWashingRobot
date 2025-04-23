@@ -1,6 +1,6 @@
 # Operation Mode
 OPERATION_MODE = {
-    'use_ui': True,  # Set to True to use UI for area selection, False to use predefined cleaning areas
+    'use_ui': False,  # Set to True to use UI for area selection, False to use predefined cleaning areas
     'default_area': 'rectangle'  # Default cleaning area to use when use_ui is False
 }
 
@@ -53,9 +53,9 @@ VISUALIZATION_PARAMS = {
 CLEANING_AREAS = {
     'rectangle': [
         {'x': 0.0, 'y': 0.0},     # Starting point
-        {'x': 2.8, 'y': 0.0},     # Right edge
-        {'x': 2.8, 'y': 3.0},     # Top-right corner
-        {'x': 0.0, 'y': 3.0},     # Top-left corner
+        {'x': 2.0, 'y': 0.0},     # Right edge
+        {'x': 2.0, 'y': 2.0},     # Top-right corner
+        {'x': 0.0, 'y': 2.0},     # Top-left corner
     ],
     'L_shape': [
         {'x': 0.0, 'y': 0.0},     # Starting point
