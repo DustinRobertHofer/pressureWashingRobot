@@ -39,7 +39,8 @@ class SensorManager:
             'left_side_distance': left_side_distance,
             'right_side_distance': right_side_distance
         }
-        print('forward_distance: ', forward_distance, 'left_fwd_distance: ', left_fwd_distance, 'right_fwd_distance: ', right_fwd_distance, 'left_side_distance: ', left_side_distance, 'right_side_distance: ', right_side_distance)
+
+        #print('forward_distance: ', forward_distance, 'left_fwd_distance: ', left_fwd_distance, 'right_fwd_distance: ', right_fwd_distance, 'left_side_distance: ', left_side_distance, 'right_side_distance: ', right_side_distance)
    
     def calculate_height(self, distance_raw):
         """Calculate height from raw distance"""

@@ -1,3 +1,4 @@
+import time
 from controller import Robot
 from navigation.navigator import Navigator
 from utils.motionController import MotionController
@@ -36,8 +37,8 @@ class RobotController:
             # When not using UI, we still need to have a reference to the interface
             self.robot_interface = RobotInterface.get_instance()
             # Set boundary points directly from config
-            self.boundary_points = CLEANING_AREAS[OPERATION_MODE['use_ui']]
-            print(f"Using predefined cleaning area: {OPERATION_MODE['use_ui']}")
+            self.boundary_points = CLEANING_AREAS[OPERATION_MODE['default_area']]
+            print(f"Using predefined cleaning area: {OPERATION_MODE['default_area']}")
         
         self._init_visualization()
         
@@ -174,8 +175,18 @@ class RobotController:
         #     return False
             
         # Stop if obstacle is too close
-        if sensor_data['forward_distance'] < NAVIGATION_PARAMS['safe_distance'] or sensor_data['left_fwd_distance'] < NAVIGATION_PARAMS['safe_distance'] or sensor_data['right_fwd_distance'] < NAVIGATION_PARAMS['safe_distance']:
-            print(f"OBSTACLE DETECTED at {sensor_data['forward_distance']:.2f}m! Stopping robot.")
+        if sensor_data['forward_distance'] < NAVIGATION_PARAMS['safe_distance']: #or sensor_data['left_fwd_distance'] < NAVIGATION_PARAMS['safe_distance'] or sensor_data['right_fwd_distance'] < NAVIGATION_PARAMS['safe_distance']:
+
+
+            self.stoppingDistance = ['forward_distance', sensor_data['forward_distance']]
+            self.motion_controller.stop()
+            return True
+        if sensor_data['left_fwd_distance'] < NAVIGATION_PARAMS['safe_distance']:
+            self.stoppingDistance = ['left_fwd_distance', sensor_data['left_fwd_distance']]
+            self.motion_controller.stop()
+            return True
+        if sensor_data['right_fwd_distance'] < NAVIGATION_PARAMS['safe_distance']:
+            self.stoppingDistance = ['right_fwd_distance', sensor_data['right_fwd_distance']]
             self.motion_controller.stop()
             return True
         
@@ -204,7 +215,11 @@ class RobotController:
         
         # Check for obstacles
         if self._check_obstacles(sensor_data):
-            return
+            time.sleep(1)
+            print('OBSTACLE DETECTED at ')
+            print(self.stoppingDistance[0])
+            print(self.stoppingDistance[1])
+            return -1
         
         # Get and execute navigation commands
         nav_command = self.navigator.get_next_command(current_state)

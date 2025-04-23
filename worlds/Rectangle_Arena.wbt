@@ -62,7 +62,7 @@ StraightRoadSegment {
   contactMaterial "FloorContact"
 }
 OilBarrel {
-  translation 3.19 2.03 0.44
+  translation 0.98	1.71 0.44
   physics Physics {
     density -1
     mass 50
